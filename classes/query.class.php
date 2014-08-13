@@ -138,6 +138,17 @@ class DBQuery {
 	 * then pushes the new data onto the end of the array.
 	 */
 	function addClause($clause, $value, $check_array = true) {
+	
+		if ( is_array( $clause ) ) 
+			$clauseI = implode( ',', $clause );
+		else
+			$clauseI = $clause;
+		
+		if ( is_array( $value ) ) 
+			$valueI = implode( ',', $value );
+		else
+			$valueI = $value;
+				
 		dprint(__FILE__, __LINE__, 8, "Adding '$value' to $clause clause");
 		if (!isset($this->$clause)) {
 			$this->$clause = array();
