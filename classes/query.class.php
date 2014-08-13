@@ -149,7 +149,7 @@ class DBQuery {
 		else
 			$valueI = $value;
 				
-		dprint(__FILE__, __LINE__, 8, "Adding '$value' to $clause clause");
+		dprint(__FILE__, __LINE__, 8, "Adding '$valueI' to $clauseI clause");
 		if (!isset($this->$clause)) {
 			$this->$clause = array();
 		}
