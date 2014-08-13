@@ -180,7 +180,9 @@ foreach ($messages as $row) {
 		$s .= '</td>';
 		$s .= '<td valign="top" style="' . $style . '">';
 		$s .= '<font size="2"><strong>' . $row['message_title'] . '</strong><hr size=1>';
-		$s .= nl2br($AppUI->___($row['message_body']));
+		//$s .= nl2br($AppUI->___($row['message_body']));
+		//$s .= ($AppUI->___($row['message_body']));
+		$s .= $row['message_body'];
 		$s .= '</font></td>';
 		
 		$s .= '</tr><tr>';
@@ -249,7 +251,8 @@ foreach ($messages as $row) {
 		$s .= '<a href="#" onclick="javascript:toggle(' . $row['message_id'] . ')">';
         $s .= '<span size="2"><strong>' . $row['message_title'] . '</strong></span></a>';
         $side .= '<div class="message" id="' . $row['message_id'] . '" style="display: none">';
-        $side .= nl2br($AppUI->___($row['message_body']));
+        //$side .= nl2br($AppUI->___($row['message_body']));
+        $side .= $row['message_body'];
         $side .= '</div>';
         $s .= '</td>';
         if ($first) {
