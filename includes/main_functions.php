@@ -180,6 +180,9 @@ function dPcontextHelp($title, $link='') {
 */
 function dPgetConfig($key, $default = null) {
 	global $dPconfig;
+
+        if ( !is_array( $dPconfig ) ) return '';
+
 	return ((array_key_exists($key, $dPconfig)) ? $dPconfig[$key] : $default);
 }
 
