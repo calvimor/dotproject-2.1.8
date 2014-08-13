@@ -84,7 +84,8 @@ function _filter_xss_split($m, $store = FALSE) {
   static $allowed_html;
 
   if ($store) {
-    $allowed_html = array_flip($m);
+	if ( is_array( $m ) )
+		$allowed_html = array_flip($m);
     return;
   }
 
