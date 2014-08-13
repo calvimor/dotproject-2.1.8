@@ -13,7 +13,8 @@ if (isset($_GET['orderby']) && in_array($_GET['orderby'], $valid_ordering)) {
 	$AppUI->setState('ForumVwOrderBy', $_GET['orderby']);
     $AppUI->setState('ForumVwOrderDir', $orderdir);
 }
-$orderby = $AppUI->getState('ForumVwOrderBy') ? $AppUI->getState('ForumVwOrderBy') : 'latest_reply';
+//$orderby = $AppUI->getState('ForumVwOrderBy') ? $AppUI->getState('ForumVwOrderBy') : 'latest_reply';
+$orderby = $AppUI->getState('ForumVwOrderBy') ? $AppUI->getState('ForumVwOrderBy') : 'message_date';
 $orderdir = $AppUI->getState('ForumVwOrderDir') ? $AppUI->getState('ForumVwOrderDir') : 'desc';
 
 //Pull All Messages
