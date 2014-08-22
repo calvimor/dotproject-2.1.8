@@ -58,7 +58,7 @@ $titleBlock->show();
     <td nowrap="nowrap"><strong><a href="?m=projects&amp;a=view&amp;project_id=<?php echo $forum['forum_project']; ?>"><strong><?php echo $AppUI->___($forum["project_name"]);?></a></strong></td>
     <td valign="top" width="50%" rowspan="99">
         <strong><?php echo $AppUI->_('Description');?>:</strong>
-        <br /><?php echo dPformSafe( $forum["forum_description"] ); //echo $AppUI->___( $forum["forum_description"], UI_OUTPUT_HTML );?>
+        <br /><?php echo $AppUI->___( $forum["forum_description"], UI_OUTPUT_HTML );?>
     </td>
 </tr>
 <tr>
