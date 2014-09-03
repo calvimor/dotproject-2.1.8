@@ -159,14 +159,15 @@ if ($dbc && ($do_db || $do_db_cfg)) {
  } else {
   dPmsg('Installing database');
   InstallLoadSql(DP_BASE_DIR.'/db/dotproject.sql');
+  InstallLoadSql(DP_BASE_DIR.'/db/carmina.sql');
   // After all the updates, find the new version information.
   $new_version = InstallGetVersion($mode, $db);
   $lastDBUpdate = $new_version['last_db_update'];
   $code_updated = $new_version['last_code_update'];
  }
 
-				$dbError = $db->ErrorNo();
-        if ($dbError <> 0 && $dbError <> 1007) {
+  $dbError = $db->ErrorNo();
+  if ($dbError <> 0 && $dbError <> 1007) {
   $dbErr = true;
                 $dbMsg .= 'A Database Error occurred. Database has probably not been populated completely!<br>'.$db->ErrorMsg().'<br>';
         }
