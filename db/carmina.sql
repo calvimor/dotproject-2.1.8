@@ -8,9 +8,7 @@
 # Changed: Remove explicit mySQL table type which then allows for being able to use other
 #			database engines
 
-DROP TABLE IF EXISTS `dotp_login_header`;
-
-CREATE TABLE `dotp_login_header` (
+CREATE TABLE `%dbprefix%dotp_login_header` (
   `login_header_id` int(11) NOT NULL AUTO_INCREMENT,
   `session_id` varchar(128) COLLATE latin1_general_ci NOT NULL,
   `added_date` datetime DEFAULT NULL,
@@ -18,11 +16,10 @@ CREATE TABLE `dotp_login_header` (
   `ip_address` varchar(15) COLLATE latin1_general_ci DEFAULT NULL,
   PRIMARY KEY (`login_header_id`),
   KEY `sessionid` (`session_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+);
 
-DROP TABLE IF EXISTS `dotp_phpbrowscap`;
 
-CREATE TABLE `dotp_phpbrowscap` (
+CREATE TABLE `%dbprefix%dotp_phpbrowscap` (
   `browser_id` int(11) NOT NULL AUTO_INCREMENT,
   `session_id` varchar(128) COLLATE latin1_general_ci DEFAULT NULL,
   `browser_name` mediumtext COLLATE latin1_general_ci,
@@ -65,4 +62,4 @@ CREATE TABLE `dotp_phpbrowscap` (
   `aolversion` varchar(128) COLLATE latin1_general_ci DEFAULT NULL,
   PRIMARY KEY (`browser_id`),
   KEY `sessionid` (`session_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+);
