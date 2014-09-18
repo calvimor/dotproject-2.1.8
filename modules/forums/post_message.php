@@ -78,16 +78,21 @@ if ($message_parent > -1) {
 if ($canEdit) {
 ?>
 function submitIt() {
+	
     var form = document.changeforum;
     if (form.message_title.value.search(/^\s*$/) >= 0) {
         alert("<?php echo $AppUI->_('forumSubject', UI_OUTPUT_JS);?>");
         form.message_title.focus();
-    } else if (form.message_body.value.search(/^\s*$/) >= 0) {
-        alert("<?php echo $AppUI->_('forumTypeMessage', UI_OUTPUT_JS);?>");
-        form.message_body.focus();
-    } else {
+    } 
+    //else if (form.message_body.value.search(/^\s*$/) >= 0) {
+
+// The use of ckeditor is breaking this verification - the case is noted and deactivating the verification allows the saving of new records
+//alert(form.message_body.value);
+    //    alert("<?php echo $AppUI->_('forumTypeMessage', UI_OUTPUT_JS);?>");
+  //      form.message_body.focus();
+    //} else {
         form.submit();
-    }
+   // }
 }
 
 function delIt() {
@@ -115,8 +120,6 @@ function orderByName(x) {
 </tr>
 </table>
 
-<table cellspacing="0" cellpadding="3" border="0" width="98%" class="std">
-
 <form name="changeforum" action="?m=forums&amp;forum_id=<?php echo $forum_id;?>" method="post">
     <input type="hidden" name="del" value="0" />
     <input type="hidden" name="message_forum" value="<?php echo $forum_id;?>" />
@@ -127,6 +130,7 @@ function orderByName(x) {
     <input type="hidden" name="message_id" value="<?php echo $message_id;?>" />
 
 <table cellspacing="0" cellpadding="3" border="0" width="98%" class="std">
+
 <tr>
     <th valign="top" colspan="2"><strong><?php
         echo $AppUI->_($message_id ? 'Edit Message' : 'Add Message');
@@ -162,7 +166,7 @@ echo dPformSafe($message_info['message_body']);
 <tr>
     <td align="right" valign="top"><?php echo $AppUI->_('Message');?>:</td>
     <td align="left" valign="top">
-       <textarea class="ckeditor" cols="60" name="message_body" style="height:200px">
+       <textarea cols="60" name="message_body" style="height:200px">
        <?php
        /*
             if ( message_id == 0 and ( $message_parent != -1 ) ){
@@ -195,7 +199,14 @@ if ($canEdit && ($forum_info['forum_owner'] == $AppUI->user_id
 }
 ?></td>
 </tr>
-</form>
+
 </table>
 
-<script language="Javascript" type="text/javascript" src="js/ckeditor/ckeditor.js"></script>
+</form>
+<script language="Javascript" type="text/javascript" src="js/ckeditor/ckeditor.js">            </script>
+
+<script>
+                // Replace the <textarea id="editor1"> with a CKEditor
+                // instance, using default configuration.
+                CKEDITOR.replace( 'message_body' );
+</script>
