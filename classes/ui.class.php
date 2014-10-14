@@ -530,10 +530,11 @@ class CAppUI {
 		if (!$query) {
 			$query = @$_SERVER['QUERY_STRING'];
 		}
-		if ($query != @$this->state['SAVEDPLACE']) {
-			$this->state['SAVEDPLACE-1'] = @$this->state['SAVEDPLACE'];
-			$this->state['SAVEDPLACE'] = $query;
-		}
+		if ( isset( $this->state['SAVEDPLACE'] ) )
+			if ($query != $this->state['SAVEDPLACE']) {
+				$this->state['SAVEDPLACE-1'] = @$this->state['SAVEDPLACE'];
+				$this->state['SAVEDPLACE'] = $query;
+			}
 	}
 /**
 * Resets the internal variable
