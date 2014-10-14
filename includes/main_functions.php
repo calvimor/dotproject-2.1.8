@@ -160,6 +160,42 @@ function breadCrumbs(&$arr) {
 	return implode(' <strong>:</strong> ', $crumbs);
 }
 
+function getUserHighestRole( $uid ){
+	
+	global $AppUI;
+	
+	require_once DP_BASE_DIR."/modules/system/roles/roles.class.php";
+	$flx_urole = array( '1'=>'guest', '2'=>'carmina-worker', '3'=>'admin' );
+  
+  	$perms = $AppUI->acl();
+	$dpRole = $perms->getUserRoles($AppUI->user_id);
+	$role_arr = array();
+
+	/* Users may have more than 1 role. We grant the highest role */
+	foreach ($dpRole as $dpRoleVal )
+	{
+	
+		$cvalue = $dpRoleVal['value'];
+
+		$a = array_search( $cvalue, $flx_urole, true );
+
+		if ( $a > 0 ) $role_arr[] = $a;
+
+	}
+
+	/* It is possible to be able to login but the role is not properly set in Dotproject hence we can only grant the Guest role but we provide a message
+	* in that case
+	*/
+	if ( count( $role_arr ) > 0 ){
+		$maxRole = max( $role_arr );
+	}else {
+		$maxRole = 0;
+	}
+
+	return $flx_urole[$maxRole];
+			
+}
+
 ##
 ## generate link for context help
 ##
