@@ -172,8 +172,10 @@ function delIt() {
       <input type="button" value="<?php echo $AppUI->_('back');?>" class="button" onclick="javascript:window.location='?m=forums';" />
    </td>
    <td align="right" colspan="2"><?php
-      if ($AppUI->user_id == $forum_info["forum_owner"] || $forum_id ==0) {
-         echo '<input type="button" value="'.$AppUI->_('submit').'" class="button" onclick="javascript:submitIt()" />';
+
+	     if ( $AppUI->user_id == $forum_info["forum_owner"] || $forum_id ==0 || getUserHighestRole( $AppUI->user_id ) == 'admin' ) {
+			 	
+			echo '<input type="button" value="'.$AppUI->_('submit').'" class="button" onclick="javascript:submitIt()" />';
       }
       ?></td>
 </tr>
