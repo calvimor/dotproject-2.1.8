@@ -27,7 +27,8 @@ require_once 'PEAR.php';
 
 define('CSS_COLOR_ERROR', 100);
 
-class CSS_Color extends PEAR
+//class CSS_Color extends PEAR
+class CSS_Color
 {
   //==================================================
   //==PARAMETERS======================================
@@ -59,17 +60,18 @@ class CSS_Color extends PEAR
   //==CONSTRUCTOR=====================================
   //==================================================
 
-  function CSS_Color($bgHex, $fgHex='')
+//  function CSS_Color($bgHex, $fgHex='')
+  function CSS_Color()
   {
     // This is the constructor method for the class,
     // which is called when a new object is created.
 
     // Initialize this PEAR object so I can
     // use the PEAR error return mechanism
-    $this->PEAR();
+   // $this->PEAR();
 
     // Initialize the palette
-    $this->setPalette($bgHex, $fgHex);
+    //$this->setPalette($bgHex, $fgHex);
   }
 
   //==================================================

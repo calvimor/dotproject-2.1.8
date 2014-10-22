@@ -188,7 +188,7 @@ if (!defined('DP_BASE_DIR')) {
 			return false;
 		}
 
-		function userId()
+		function userId($username='')
 		{
 			return $this->user_id;
 		}
@@ -305,7 +305,7 @@ if (!defined('DP_BASE_DIR')) {
 			return $result;
 		}
 
-		function userId($username)
+		function userId($username = '')
 		{
 			GLOBAL $db;
 			$q  = new DBQuery;

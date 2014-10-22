@@ -406,8 +406,8 @@ class CDpObject {
 		
 		$uid = intval($uid);
 		$uid || exit ('FATAL ERROR<br />' . get_class($this) . '::getAllowedSQL failed');
-		$deny =& $perms->getDeniedItems($mod, $uid);
-		$allow =& $perms->getAllowedItems($mod, $uid);
+		$deny = $perms->getDeniedItems($mod, $uid);
+		$allow = $perms->getAllowedItems($mod, $uid);
 		if (!($perms->checkModule($mod, 'view', $uid))) {
 			if (!(count($allow))) {
 				return array('1=0');	// No access, and no allow overrides, so nothing to show.
@@ -437,8 +437,8 @@ class CDpObject {
 		
 		$uid = intval($uid);
 		$uid || exit ('FATAL ERROR<br />' . get_class($this) . '::getAllowedSQL failed');
-		$deny =& $perms->getDeniedItems($mod, $uid);
-		$allow =& $perms->getAllowedItems($mod, $uid);
+		$deny = $perms->getDeniedItems($mod, $uid);
+		$allow = $perms->getAllowedItems($mod, $uid);
 		// Make sure that we add the table otherwise dependencies break
 		if (isset($index)) {
 			if (!($key)) {
