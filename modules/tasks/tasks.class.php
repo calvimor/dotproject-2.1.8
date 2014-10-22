@@ -566,7 +566,7 @@ class CTask extends CDpObject
 	/**
 	 * @todo Parent store could be partially used
 	 */
-	function store() {
+	function store($updateNulls = false) {
 		GLOBAL $AppUI;
 		$q = new DBQuery;
 		
@@ -718,7 +718,7 @@ class CTask extends CDpObject
 	 * @todo Parent store could be partially used
 	 * @todo Can't delete a task with children
 	 */
-	function delete() {
+	function delete($oid = NULL, $history_desc = '', $history_proj = 0) {
 		if (!($this->task_id)) {
 			return 'invalid task id';
 		}
@@ -1231,7 +1231,7 @@ class CTask extends CDpObject
 	 * @param Date End date of the period
 	 * @param integer The target company
 	 */
-	function getTasksForPeriod($start_date, $end_date, $company_id=0, $user_id=null, 
+	static function getTasksForPeriod($start_date, $end_date, $company_id=0, $user_id=null, 
 	                           $filter_proj_archived=false, $filter_proj_completed=false) {
 		GLOBAL $AppUI;
 		$q = new DBQuery;

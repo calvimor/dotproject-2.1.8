@@ -253,7 +253,8 @@ class CConfig extends CDpObject {
 		return NULL; // object is ok
 	}
 	
-	function store() {
+	/* Added param to satisfy the parent class  */
+	function store($updateNulls = false) {
 		$msg = $this->check();
 		return (($msg) ? $msg : parent::store());
 	}
@@ -293,7 +294,8 @@ class bcode extends CDpObject {
 		}
 	}
 	
-	function delete() {
+	/* Added param to satisfy the parent class */
+	function delete($oid=null, $history_desc = '',  $history_proj = 0) {
 		$q = new DBQuery;
 		$q->addTable('billingcode');
 		$q->addUpdate('billingcode_status', '1');
@@ -307,7 +309,7 @@ class bcode extends CDpObject {
 		}
 	}
 	
-	function store() {
+	function store($updateNulls = false) {
 		$q = new DBQuery;
 		$q->addQuery('billingcode_id');
 		$q->addTable('billingcode');
