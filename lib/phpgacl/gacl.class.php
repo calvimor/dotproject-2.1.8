@@ -1,7 +1,7 @@
 <?php
-// $Id: gacl.class.php 2428 2004-10-15 01:04:33Z ajdonnison $
+// $Id: gacl.class.php 422 2006-09-03 22:52:20Z ipso $
 
-/*
+/**
  * phpGACL - Generic Access Control List
  * Copyright (C) 2002,2003 Mike Benoit
  *
@@ -28,19 +28,31 @@
  * The latest version of phpGACL can be obtained from:
  * http://phpgacl.sourceforge.net/
  *
+ * @package phpGACL
  */
 
 /*
  * Path to ADODB.
  */
 if ( !defined('ADODB_DIR') ) {
-	define('ADODB_DIR', dirname(__FILE__).'/../adodb');
+	define('ADODB_DIR', dirname(__FILE__).'/adodb');
 }
-
+  
 /**
 * phpGACL main class
+*
+* Class gacl should be used in applications where only querying the phpGACL
+* database is required.
+*
+* @package phpGACL
+* @author Mike Benoit <ipso@snappymail.ca>
 */
 class gacl {
+	/*
+	--- phpGACL Configuration path/file ---
+	*/
+	var $config_file = 'gacl.ini.php';
+
 	/*
 	--- Private properties ---
 	*/
@@ -51,7 +63,7 @@ class gacl {
 	--- Database configuration. ---
 	*/
 	/** @var string Prefix for all the phpgacl tables in the database */
-	var $_db_table_prefix = 'gacl_';
+	var $_db_table_prefix = '';
 
 	/** @var string The database type, based on available ADODB connectors - mysql, postgres7, sybase, oci8po See here for more: http://php.weblogs.com/adodb_manual#driverguide */
 	var $_db_type = 'mysql';
@@ -60,7 +72,7 @@ class gacl {
 	var $_db_host = 'localhost';
 
 	/** @var string The database user name */
-	var $_db_user = '';
+	var $_db_user = 'root';
 
 	/** @var string The database user password */
 	var $_db_password = '';
@@ -93,12 +105,31 @@ class gacl {
 
 	/**
 	 * Constructor
-	 * @param array An arry of options to oeverride the class defaults
+	 * @param array An array of options to override the class defaults
 	 */
 	function gacl($options = NULL) {
 
+		$gacl_configA = pathinfo( __FILE__ );
+		
+		$dirname = $gacl_configA['dirname'] . DIRECTORY_SEPARATOR;
+		$this->config_file = $dirname . $this->config_file;
+		
 		$available_options = array('db','debug','items_per_page','max_select_box_items','max_search_return_items','db_table_prefix','db_type','db_host','db_user','db_password','db_name','caching','force_cache_expire','cache_dir','cache_expire_time');
+
+		//Values supplied in $options array overwrite those in the config file.
+		if ( file_exists( $this->config_file) ) {
+
+		        $config = parse_ini_file($this->config_file);
+
+		        if ( is_array($config) ) {
+		                $gacl_options = array_merge($config, $options);
+		        }
+
+	        	unset($config);
+		}
+
 		if (is_array($options)) {
+			
 			foreach ($options as $key => $value) {
 				$this->debug_text("Option: $key");
 
@@ -115,37 +146,38 @@ class gacl {
 		require_once( ADODB_DIR .'/adodb.inc.php');
 		require_once( ADODB_DIR .'/adodb-pager.inc.php');
 
-		//Use NUM for slight performance/memory reasons.
-		//Leave this in for backwards compatibility with older ADODB installations.
-		//If your using ADODB v3.5+ feel free to comment out the following line if its giving you problems.
-		$ADODB_FETCH_MODE = ADODB_FETCH_NUM;
-
 		if (is_object($this->_db)) {
 			$this->db = &$this->_db;
 		} else {
 			$this->db = ADONewConnection($this->_db_type);
+			//Use NUM for slight performance/memory reasons.
 			$this->db->SetFetchMode(ADODB_FETCH_NUM);
 			$this->db->PConnect($this->_db_host, $this->_db_user, $this->_db_password, $this->_db_name);
 		}
 		$this->db->debug = $this->_debug;
 
-		if (!class_exists('Hashed_Cache_Lite')) {
-			require_once(dirname(__FILE__) .'/Cache_Lite/Hashed_Cache_Lite.php');
-		}
+		if ( $this->_caching == TRUE ) {
+			if (!class_exists('Hashed_Cache_Lite')) {
+				require_once(dirname(__FILE__) .'/Cache_Lite/Hashed_Cache_Lite.php');
+			}
 
-		/*
-		 * Cache options. We default to the highest performance. If you run in to cache corruption problems,
-		 * Change all the 'false' to 'true', this will slow things down slightly however.
-		 */
-		$cache_options = array(
-			'caching' => $this->_caching,
-			'cacheDir' => $this->_cache_dir.'/',
-			'lifeTime' => $this->_cache_expire_time,
-			'fileLocking' => true,
-			'writeControl' => false,
-			'readControl' => false,
-		);
-		$this->Cache_Lite = new Hashed_Cache_Lite($cache_options);
+			/*
+			 * Cache options. We default to the highest performance. If you run in to cache corruption problems,
+			 * Change all the 'false' to 'true', this will slow things down slightly however.
+			 */
+
+			$cache_options = array(
+				'caching' => $this->_caching,
+				'cacheDir' => $this->_cache_dir.'/',
+				'lifeTime' => $this->_cache_expire_time,
+				'fileLocking' => TRUE,
+				'writeControl' => FALSE,
+				'readControl' => FALSE,
+				'memoryCaching' => TRUE,
+				'automaticSerialization' => FALSE				
+			);
+			$this->Cache_Lite = new Hashed_Cache_Lite($cache_options);
+		}
 
 		return true;
 	}
@@ -189,15 +221,12 @@ class gacl {
 	* @param string The AXO section value (optional)
 	* @param integer The group id of the ARO ??Mike?? (optional)
 	* @param integer The group id of the AXO ??Mike?? (optional)
-	* @return mixed Generally a zero (0) or (1) or the extended return value of the ACL
+	* @return boolean TRUE if the check succeeds, false if not.
 	*/
 	function acl_check($aco_section_value, $aco_value, $aro_section_value, $aro_value, $axo_section_value=NULL, $axo_value=NULL, $root_aro_group=NULL, $root_axo_group=NULL) {
 		$acl_result = $this->acl_query($aco_section_value, $aco_value, $aro_section_value, $aro_value, $axo_section_value, $axo_value, $root_aro_group, $root_axo_group);
 
-		if ($acl_result)
-			return $acl_result['allow'];
-		else
-			return false;
+		return $acl_result['allow'];
 	}
 
 	/**
@@ -210,9 +239,9 @@ class gacl {
 	* @param string The ARO section
 	* @param string The AXO section value (optional)
 	* @param string The AXO section value (optional)
-	* @param integer The group id of the ARO ??Mike?? (optional)
-	* @param integer The group id of the AXO ??Mike?? (optional)
-	* @return mixed Generally a zero (0) or (1) or the extended return value of the ACL
+	* @param integer The group id of the ARO (optional)
+	* @param integer The group id of the AXO (optional)
+	* @return string The return value of the ACL
 	*/
 	function acl_return_value($aco_section_value, $aco_value, $aro_section_value, $aro_value, $axo_section_value=NULL, $axo_value=NULL, $root_aro_group=NULL, $root_axo_group=NULL) {
 		$acl_result = $this->acl_query($aco_section_value, $aco_value, $aro_section_value, $aro_value, $axo_section_value, $axo_value, $root_aro_group, $root_axo_group);
@@ -265,8 +294,8 @@ class gacl {
 	* @param string The ARO section
 	* @param string The AXO section value (optional)
 	* @param string The AXO section value (optional)
-	* @param integer The group id of the ARO ??Mike?? (optional)
-	* @param integer The group id of the AXO ??Mike?? (optional)
+	* @param string The value of the ARO group (optional)
+	* @param string The value of the AXO group (optional)
 	* @param boolean Debug the operation if true (optional)
 	* @return array Returns as much information as possible about the ACL so other functions can trim it down and omit unwanted data.
 	*/
@@ -509,7 +538,7 @@ class gacl {
 					FROM		' . $group_table . ' g1,' . $group_table . ' g2';
 
 				$where = '
-					WHERE		g1.value=' . $value;
+					WHERE		g1.value=' . $this->db->quote( $value );
 			} else {
 				$query .= '
 					FROM		'. $object_table .' o,'. $group_map_table .' gm,'. $group_table .' g1,'. $group_table .' g2';
@@ -532,7 +561,7 @@ class gacl {
 				$query .= ','. $group_table .' g3';
 
 				$where .= '
-						AND		g3.value='. $root_group .'
+						AND		g3.value='. $this->db->quote( $root_group ) .'
 						AND		((g2.lft BETWEEN g3.lft AND g1.lft) AND (g2.rgt BETWEEN g1.rgt AND g3.rgt))';
 			} else {
 				$where .= '
@@ -572,10 +601,12 @@ class gacl {
 	*/
 	function get_cache($cache_id) {
 
-		$this->debug_text("get_cache(): on ID: $cache_id");
+		if ( $this->_caching == TRUE ) {
+			$this->debug_text("get_cache(): on ID: $cache_id");
 
-		if ( is_string($this->Cache_Lite->get($cache_id) ) ) {
-			return unserialize($this->Cache_Lite->get($cache_id) );
+			if ( is_string($this->Cache_Lite->get($cache_id) ) ) {
+				return unserialize($this->Cache_Lite->get($cache_id) );
+			}
 		}
 
 		return false;
@@ -589,9 +620,13 @@ class gacl {
 	*/
 	function put_cache($data, $cache_id) {
 
-		$this->debug_text("put_cache(): Cache MISS on ID: $cache_id");
+		if ( $this->_caching == TRUE ) {
+			$this->debug_text("put_cache(): Cache MISS on ID: $cache_id");
 
-		return $this->Cache_Lite->save(serialize($data), $cache_id);
+			return $this->Cache_Lite->save(serialize($data), $cache_id);
+		}
+
+		return false;
 	}
 }
 ?>

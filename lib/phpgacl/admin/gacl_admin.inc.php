@@ -28,67 +28,43 @@
  *
  */
 
-// Prefix added to restrict access to these functions to only
-// the original dotproject user.
-$baseDir = dirname(__FILE__)."/../../..";
-define('DP_BASE_DIR', $baseDir);
-require_once "$baseDir/includes/config.php";
-require_once  "$baseDir/classes/ui.class.php";
-require_once "$baseDir/includes/session.php";
 require_once(dirname(__FILE__).'/../gacl.class.php');
 require_once(dirname(__FILE__).'/../gacl_api.class.php');
+require_once(dirname(__FILE__).'/gacl_admin_api.class.php');
 
-dPsessionStart();
+// phpGACL Configuration file.
+if ( !isset($config_file) ) {
+#	$config_file = '../gacl.ini.php';
+	$config_file = dirname(__FILE__).'/../gacl.ini.php';
+}
 
-$gacl_options = array(
-								'debug' => FALSE,
-								'items_per_page' => 100,
-								'max_select_box_items' => 100,
-								'max_search_return_items' => 200,
-								'db_type' => $dPconfig['dbtype'],
-								'db_host' => $dPconfig['dbhost'],
-								'db_user' => $dPconfig['dbuser'],
-								'db_password' => $dPconfig['dbpass'],
-								'db_name' => $dPconfig['dbname'],
-								'db_table_prefix' => 'gacl_',
-								'caching' => FALSE,
-								'force_cache_expire' => TRUE,
-								'cache_dir' => '/tmp/phpgacl_cache',
-								'cache_expire_time' => 600
-							);
+//Values supplied in $gacl_options array overwrite those in the config file.
+if ( file_exists($config_file) ) {
+	$config = parse_ini_file($config_file);
 
+	if ( is_array($config) ) {
+		if ( isset($gacl_options) ) {
+			$gacl_options = array_merge($config, $gacl_options);
+		} else {
+			$gacl_options = $config;
+		}
+	}
+	unset($config);
+}
 
-$gacl_api = new gacl_api($gacl_options);
+$gacl_api = new gacl_admin_api($gacl_options);
 
 $gacl = &$gacl_api;
 
 $db = &$gacl->db;
 
-if (! isset($_SESSION['AppUI']))
-  die ("You must log into dotProject first");
-if ( $_SESSION['AppUI']->user_id != 1 ) {
-  // bit of a chicken and egg here, but allow other users to manage acls.
-  if (! $gacl->acl_check("application", "access", "user", $_SESSION['AppUI']->user_id, "sys", "acl"))
-    die ("You do not have the appropriate permissions for this task");
-}
-// End of dotproject login check.
-
-
-
-/*
- * Configure the Smarty Class for the administration interface ONLY!
- */
-$smarty_dir = "$baseDir/lib/smarty"; //NO trailing slash!
-$smarty_template_dir = "$smarty_dir/templates"; //NO trailing slash!
-$smarty_compile_dir = "$smarty_dir/templates_c"; //NO trailing slash!
-
 //Setup the Smarty Class.
-require_once($smarty_dir.'/Smarty.class.php');
+require_once($gacl_options['smarty_dir'].'/Smarty.class.php');
 
 $smarty = new Smarty;
 $smarty->compile_check = TRUE;
-$smarty->template_dir = $smarty_template_dir;
-$smarty->compile_dir = $smarty_compile_dir;
+$smarty->template_dir = $gacl_options['smarty_template_dir'];
+$smarty->compile_dir = $gacl_options['smarty_compile_dir'];
 
 /*
  * Email address used in setup.php, please do not change.

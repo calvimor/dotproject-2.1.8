@@ -25,6 +25,8 @@ if (!(defined('ADODB_DIR'))) {
 	define('ADODB_DIR', DP_BASE_DIR . '/lib/adodb');
 }
 
+define( 'GACL_PREFIX', 'dotp_gacl_' );
+
 //Include the PHPGACL library
 require_once DP_BASE_DIR . '/lib/phpgacl/gacl.class.php';
 require_once DP_BASE_DIR . '/lib/phpgacl/gacl_api.class.php';
@@ -47,14 +49,18 @@ class dPacl extends gacl_api {
 		if (!(is_array($opts))) {
 			$opts = array();
 		}
+		
+		if ( empty( $this->_db_table_prefix ) )
+			$this->_db_table_prefix = 'gacl_';
+		
+		$this->_original_db_prefix = $this->_db_table_prefix;	
+		
 		$opts['db_type'] = dPgetConfig('dbtype');
 		$opts['db_host'] = dPgetConfig('dbhost');
 		$opts['db_user'] = dPgetConfig('dbuser');
 		$opts['db_password'] = dPgetConfig('dbpass');
 		$opts['db_name'] = dPgetConfig('dbname');
-		$opts['caching'] = dPgetConfig('gacl_cache', false);
-		// With dotP prefixing, we can end up with doubles if we perform queries ourself.
-		$this->_original_db_prefix = $this->_db_table_prefix;
+		$opts['caching'] = dPgetConfig('gacl_cache', false);	
 		$opts['db_table_prefix'] = dPgetConfig('dbprefix','').$this->_db_table_prefix;
 		$opts['force_cache_expire'] = dPgetConfig('gacl_expire', true);
 		$opts['cache_dir'] = dPgetConfig('gacl_cache_dir', '/tmp');
@@ -67,6 +73,7 @@ class dPacl extends gacl_api {
 		if (dPgetConfig('debug', 0) > 10) {
 			$this->_debug = true;
 		}
+		
 		parent::gacl_api($opts);
 	}
 	
@@ -293,8 +300,7 @@ class dPacl extends gacl_api {
 		$q->addQuery('acl_id');
 		$q->addWhere("value = '" . $mod ."'");
 		$acls = $q->loadHashList('acl_id');
-		$q->clear();
-		
+		$q->clear();	
 		$tables = array('gacl_aco_map' => 'acl_id', 'gacl_aro_map' => 'acl_id', 'gacl_acl' => 'id');
 		foreach ($acls as $acl => $k) {
 			//Deleting gacl_aco_map, gacl_aro_map, and gacl_aco_map entries
@@ -601,6 +607,7 @@ class dPacl extends gacl_api {
 				$group_type = 'aro';
 				break;
 		}
+
 		$table = $this->_original_db_prefix . $group_type . '_groups';
 		$map_table = $this->_original_db_prefix . 'groups_' . $group_type . '_map';
 		$map_field = $group_type . '_id';

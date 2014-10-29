@@ -75,10 +75,7 @@ switch ($_POST['action']) {
         $query = "select id,value,order_value,name from $object_sections_table order by order_value";
 
         $rs = $db->pageexecute($query, $gacl_api->_items_per_page, $_GET['page']);
-	if ($rs)
-	  $rows = $rs->GetRows();
-	else
-	  $rows = array();
+        $rows = $rs->GetRows();
 
         $sections = array();
 

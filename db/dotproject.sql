@@ -810,17 +810,17 @@ list_value varchar(250)
 
 CREATE TABLE `%dbprefix%gacl_acl` (
   `id` int(11) NOT NULL default '0',
-  `section_value` varchar(80) NOT NULL default 'system',
+  `section_value` varchar(230) NOT NULL default 'system',
   `allow` int(11) NOT NULL default '0',
   `enabled` int(11) NOT NULL default '0',
-  `return_value` longtext,
-  `note` longtext,
+  `return_value` text,
+  `note` text,
   `updated_date` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   KEY `gacl_enabled_acl` (`enabled`),
   KEY `gacl_section_value_acl` (`section_value`),
   KEY `gacl_updated_date_acl` (`updated_date`)
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 ;
 # --------------------------------------------------------
 
 #
@@ -834,14 +834,14 @@ CREATE TABLE `%dbprefix%gacl_acl` (
 DROP TABLE IF EXISTS `%dbprefix%gacl_acl_sections`;
 CREATE TABLE `%dbprefix%gacl_acl_sections` (
   `id` int(11) NOT NULL default '0',
-  `value` varchar(80) NOT NULL default '',
+  `value` varchar(230) NOT NULL default '',
   `order_value` int(11) NOT NULL default '0',
-  `name` varchar(230) NOT NULL default '',
+  `name` varchar(230) NOT NULL,
   `hidden` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `gacl_value_acl_sections` (`value`),
   KEY `gacl_hidden_acl_sections` (`hidden`)
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 ;
 # --------------------------------------------------------
 
 #
@@ -855,15 +855,15 @@ CREATE TABLE `%dbprefix%gacl_acl_sections` (
 DROP TABLE IF EXISTS `%dbprefix%gacl_aco`;
 CREATE TABLE `%dbprefix%gacl_aco` (
   `id` int(11) NOT NULL default '0',
-  `section_value` varchar(80) NOT NULL default '0',
-  `value` varchar(80) NOT NULL default '',
+  `section_value` varchar(240) NOT NULL default '',
+  `value` varchar(240) NOT NULL,
   `order_value` int(11) NOT NULL default '0',
-  `name` varchar(255) NOT NULL default '',
+  `name` varchar(255) NOT NULL,
   `hidden` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `gacl_section_value_value_aco` (`section_value`,`value`),
   KEY `gacl_hidden_aco` (`hidden`)
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 ;
 # --------------------------------------------------------
 
 #
@@ -876,8 +876,8 @@ CREATE TABLE `%dbprefix%gacl_aco` (
 DROP TABLE IF EXISTS `%dbprefix%gacl_aco_map`;
 CREATE TABLE `%dbprefix%gacl_aco_map` (
   `acl_id` int(11) NOT NULL default '0',
-  `section_value` varchar(80) NOT NULL default '0',
-  `value` varchar(80) NOT NULL default '',
+  `section_value` varchar(230) NOT NULL default '',
+  `value` varchar(230) NOT NULL,
   PRIMARY KEY  (`acl_id`,`section_value`,`value`)
 ) ;
 # --------------------------------------------------------
@@ -893,14 +893,14 @@ CREATE TABLE `%dbprefix%gacl_aco_map` (
 DROP TABLE IF EXISTS `%dbprefix%gacl_aco_sections`;
 CREATE TABLE `%dbprefix%gacl_aco_sections` (
   `id` int(11) NOT NULL default '0',
-  `value` varchar(80) NOT NULL default '',
+  `value` varchar(230) NOT NULL,
   `order_value` int(11) NOT NULL default '0',
-  `name` varchar(230) NOT NULL default '',
+  `name` varchar(230) NOT NULL,
   `hidden` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `gacl_value_aco_sections` (`value`),
   KEY `gacl_hidden_aco_sections` (`hidden`)
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 # --------------------------------------------------------
 
 #
@@ -914,15 +914,15 @@ CREATE TABLE `%dbprefix%gacl_aco_sections` (
 DROP TABLE IF EXISTS `%dbprefix%gacl_aro`;
 CREATE TABLE `%dbprefix%gacl_aro` (
   `id` int(11) NOT NULL default '0',
-  `section_value` varchar(80) NOT NULL default '0',
-  `value` varchar(80) NOT NULL default '',
+  `section_value` varchar(240) NOT NULL default '',
+  `value` varchar(240) NOT NULL,
   `order_value` int(11) NOT NULL default '0',
-  `name` varchar(255) NOT NULL default '',
+  `name` varchar(255) NOT NULL,
   `hidden` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `gacl_section_value_value_aro` (`section_value`,`value`),
   KEY `gacl_hidden_aro` (`hidden`)
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 # --------------------------------------------------------
 
 #
@@ -939,13 +939,13 @@ CREATE TABLE `%dbprefix%gacl_aro_groups` (
   `parent_id` int(11) NOT NULL default '0',
   `lft` int(11) NOT NULL default '0',
   `rgt` int(11) NOT NULL default '0',
-  `name` varchar(255) NOT NULL default '',
-  `value` varchar(80) NOT NULL default '',
+  `name` varchar(255) NOT NULL,
+  `value` varchar(250) NOT NULL,
   PRIMARY KEY  (`id`,`value`),
   KEY `gacl_parent_id_aro_groups` (`parent_id`),
-  KEY `gacl_value_aro_groups` (`value`),
+  UNIQUE KEY `gacl_value_aro_groups` (`value`),
   KEY `gacl_lft_rgt_aro_groups` (`lft`,`rgt`)
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 # --------------------------------------------------------
 
 #
@@ -960,7 +960,7 @@ CREATE TABLE `%dbprefix%gacl_aro_groups_map` (
   `acl_id` int(11) NOT NULL default '0',
   `group_id` int(11) NOT NULL default '0',
   PRIMARY KEY  (`acl_id`,`group_id`)
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 # --------------------------------------------------------
 
 #
@@ -973,10 +973,10 @@ CREATE TABLE `%dbprefix%gacl_aro_groups_map` (
 DROP TABLE IF EXISTS `%dbprefix%gacl_aro_map`;
 CREATE TABLE `%dbprefix%gacl_aro_map` (
   `acl_id` int(11) NOT NULL default '0',
-  `section_value` varchar(80) NOT NULL default '0',
-  `value` varchar(80) NOT NULL default '',
+  `section_value` varchar(230) NOT NULL,
+  `value` varchar(230) NOT NULL default '',
   PRIMARY KEY  (`acl_id`,`section_value`,`value`)
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 # --------------------------------------------------------
 
 #
@@ -990,14 +990,14 @@ CREATE TABLE `%dbprefix%gacl_aro_map` (
 DROP TABLE IF EXISTS `%dbprefix%gacl_aro_sections`;
 CREATE TABLE `%dbprefix%gacl_aro_sections` (
   `id` int(11) NOT NULL default '0',
-  `value` varchar(80) NOT NULL default '',
+  `value` varchar(230) NOT NULL,
   `order_value` int(11) NOT NULL default '0',
-  `name` varchar(230) NOT NULL default '',
+  `name` varchar(230) NOT NULL,
   `hidden` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `gacl_value_aro_sections` (`value`),
   KEY `gacl_hidden_aro_sections` (`hidden`)
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 # --------------------------------------------------------
 
 #
@@ -1011,15 +1011,15 @@ CREATE TABLE `%dbprefix%gacl_aro_sections` (
 DROP TABLE IF EXISTS `%dbprefix%gacl_axo`;
 CREATE TABLE `%dbprefix%gacl_axo` (
   `id` int(11) NOT NULL default '0',
-  `section_value` varchar(80) NOT NULL default '0',
-  `value` varchar(80) NOT NULL default '',
+  `section_value` varchar(240) NOT NULL default '',
+  `value` varchar(240) NOT NULL,
   `order_value` int(11) NOT NULL default '0',
-  `name` varchar(255) NOT NULL default '',
+  `name` varchar(255) NOT NULL,
   `hidden` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `gacl_section_value_value_axo` (`section_value`,`value`),
   KEY `gacl_hidden_axo` (`hidden`)
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 # --------------------------------------------------------
 
 #
@@ -1036,13 +1036,13 @@ CREATE TABLE `%dbprefix%gacl_axo_groups` (
   `parent_id` int(11) NOT NULL default '0',
   `lft` int(11) NOT NULL default '0',
   `rgt` int(11) NOT NULL default '0',
-  `name` varchar(255) NOT NULL default '',
-  `value` varchar(80) NOT NULL default '',
+  `name` varchar(255) NOT NULL,
+  `value` varchar(250) NOT NULL,
   PRIMARY KEY  (`id`,`value`),
   KEY `gacl_parent_id_axo_groups` (`parent_id`),
-  KEY `gacl_value_axo_groups` (`value`),
+  UNIQUE KEY `gacl_value_axo_groups` (`value`),
   KEY `gacl_lft_rgt_axo_groups` (`lft`,`rgt`)
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 # --------------------------------------------------------
 
 #
@@ -1057,7 +1057,7 @@ CREATE TABLE `%dbprefix%gacl_axo_groups_map` (
   `acl_id` int(11) NOT NULL default '0',
   `group_id` int(11) NOT NULL default '0',
   PRIMARY KEY  (`acl_id`,`group_id`)
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 # --------------------------------------------------------
 
 #
@@ -1070,10 +1070,10 @@ CREATE TABLE `%dbprefix%gacl_axo_groups_map` (
 DROP TABLE IF EXISTS `%dbprefix%gacl_axo_map`;
 CREATE TABLE `%dbprefix%gacl_axo_map` (
   `acl_id` int(11) NOT NULL default '0',
-  `section_value` varchar(80) NOT NULL default '0',
-  `value` varchar(80) NOT NULL default '',
+  `section_value` varchar(230) NOT NULL default '',
+  `value` varchar(230) NOT NULL,
   PRIMARY KEY  (`acl_id`,`section_value`,`value`)
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 # --------------------------------------------------------
 
 #
@@ -1087,14 +1087,14 @@ CREATE TABLE `%dbprefix%gacl_axo_map` (
 DROP TABLE IF EXISTS `%dbprefix%gacl_axo_sections`;
 CREATE TABLE `%dbprefix%gacl_axo_sections` (
   `id` int(11) NOT NULL default '0',
-  `value` varchar(80) NOT NULL default '',
+  `value` varchar(230) NOT NULL,
   `order_value` int(11) NOT NULL default '0',
   `name` varchar(230) NOT NULL default '',
   `hidden` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `gacl_value_axo_sections` (`value`),
   KEY `gacl_hidden_axo_sections` (`hidden`)
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 # --------------------------------------------------------
 
 #
@@ -1109,7 +1109,7 @@ CREATE TABLE `%dbprefix%gacl_groups_aro_map` (
   `group_id` int(11) NOT NULL default '0',
   `aro_id` int(11) NOT NULL default '0',
   PRIMARY KEY  (`group_id`,`aro_id`)
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 # --------------------------------------------------------
 
 #
@@ -1124,7 +1124,7 @@ CREATE TABLE `%dbprefix%gacl_groups_axo_map` (
   `group_id` int(11) NOT NULL default '0',
   `axo_id` int(11) NOT NULL default '0',
   PRIMARY KEY  (`group_id`,`axo_id`)
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 # --------------------------------------------------------
 
 #
@@ -1136,10 +1136,10 @@ CREATE TABLE `%dbprefix%gacl_groups_axo_map` (
 
 DROP TABLE IF EXISTS `%dbprefix%gacl_phpgacl`;
 CREATE TABLE `%dbprefix%gacl_phpgacl` (
-  `name` varchar(230) NOT NULL default '',
-  `value` varchar(230) NOT NULL default '',
+  `name` varchar(230) NOT NULL,
+  `value` varchar(230) NOT NULL,
   PRIMARY KEY  (`name`)
-) ;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 DROP TABLE IF EXISTS `%dbprefix%billingcode`;
 CREATE TABLE `%dbprefix%billingcode` (

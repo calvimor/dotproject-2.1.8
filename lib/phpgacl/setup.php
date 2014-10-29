@@ -1,5 +1,7 @@
 <?php
 
+$config_file = './gacl.ini.php';
+
 require_once('./admin/gacl_admin.inc.php');
 require_once(ADODB_DIR .'/adodb-xmlschema.inc.php');
 
@@ -54,8 +56,8 @@ if (is_resource($db->_connectionID)) {
  */
 echo '<hr/><h2>Testing database type...</h2>'."\n";
 
-switch ($db_type) {
-	case mysql:
+switch ( $db_type ) {
+	case ($db_type == "mysql" OR $db_type == "mysqlt" OR $db_type == "maxsql" ):
 		echo_success("Compatible database type \"<b>$db_type</b>\" detected!");
 		echo_normal("Making sure database \"<b>$db_name</b>\" exists...");
 
@@ -78,7 +80,7 @@ switch ($db_type) {
 		}
 
 		break;
-	case postgres7:
+	case ( $db_type == "postgres8" OR $db_type == "postgres7" ):
 		echo_success("Compatible database type \"<b>$db_type</b>\" detected!");
 
 		echo_normal("Making sure database \"<b>$db_name</b>\" exists...");
@@ -103,7 +105,7 @@ switch ($db_type) {
 
 		break;
 
-	case oci8-po:
+	case "oci8-po":
 		echo_success("Compatible database type \"<b>$db_type</b>\" detected!");
 
 		echo_normal("Making sure database \"<b>$db_name</b>\" exists...");
@@ -127,6 +129,32 @@ switch ($db_type) {
 		}
 
 		break;
+		
+	case "mssql":
+		echo_success("Compatible database type \"<b>$db_type</b>\" detected!");
+
+		echo_normal("Making sure database \"<b>$db_name</b>\" exists...");
+
+		$databases = $db->GetCol("select CATALOG_NAME from INFORMATION_SCHEMA.SCHEMATA");
+
+		if (in_array($db_name, $databases) ) {
+				echo_success("Good, database \"<b>$db_name</b>\" already exists!");
+		} else {
+				echo_normal("Database \"<b>$db_name</b>\" does not exist!");
+				echo_normal("Lets try to create it...");
+
+				if (!$db->Execute("create database $db_name") ) {
+						echo_failed("Database \"<b>$db_name</b>\" could not be created, please do so manually.");
+				} else {
+						echo_success("Good, database \"<b>$db_name</b>\" has been created!!");
+
+						//Reconnect. Hrmm, this is kinda weird.
+						$db->Connect($db_host, $db_user, $db_password, $db_name);
+				}
+		}
+
+		break;
+		
 	default:
 		echo_normal("Sorry, <b>setup.php</b> currently does not fully support \"<b>$db_type</b>\" databases.
 					<br>I'm assuming you've already created the database \"$db_name\", attempting to create tables.
@@ -139,7 +167,7 @@ switch ($db_type) {
  */
 // Create the schema object and build the query array.
 $schema = new adoSchema($db);
-$schema->SetPrefix($db_table_prefix);
+$schema->SetPrefix($db_table_prefix, FALSE); //set $underscore == FALSE
 
 // Build the SQL array
 $schema->ParseSchema('schema.xml');
@@ -168,7 +196,7 @@ Installation Successful!!!
 <font color="red"><b>*IMPORTANT*</b></font><br/>
 <p>Please make sure you create the <b>&lt;phpGACL root&gt;/admin/templates_c</b> directory,
 and give it <b>write permissions</b> for the user your web server runs as.</p>
-<p>Please read the manual, and example.php to familiarize yourself with phpGACL.</p>
+<p>Please read the manual, and docs/examples/* to familiarize yourself with phpGACL.</p>
 <a href="admin/about.php?first_run=1"><b>Let\'s get started!</b></a>
 </div>
 ');

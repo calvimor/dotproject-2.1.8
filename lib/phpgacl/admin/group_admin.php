@@ -34,7 +34,7 @@ switch ($_POST['action']) {
 			SELECT		a.id, a.name, a.value, count(b.'. $group_type .'_id)
 			FROM		'. $group_table .' a
 			LEFT JOIN	'. $group_map_table .' b ON b.group_id=a.id
-			GROUP BY	a.id';
+			GROUP BY	a.id,a.name,a.value';
 		$rs = $db->Execute($query);
 		
 		$group_data = array();

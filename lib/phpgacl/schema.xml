@@ -17,7 +17,7 @@
 			DELETE FROM phpgacl WHERE name='version'
 		</query>
 		<query>
-			INSERT INTO phpgacl (name,value) VALUES ('version','3.3.2')
+			INSERT INTO phpgacl (name,value) VALUES ('version','3.3.7')
 		</query>
 		<query>
 			DELETE FROM phpgacl WHERE name='schema_version'
@@ -399,6 +399,7 @@
 		</index>
 		<index name="value_aro_groups">
 			<col>value</col>
+			<UNIQUE/>
 		</index>
 		<index name="lft_rgt_aro_groups">
 			<col>lft</col>
@@ -418,6 +419,10 @@
 			<NOTNULL/>
 			<KEY/>
 		</field>
+		<index name="aro_id">
+			<descr>Index on aro_id</descr>
+			<col>aro_id</col>
+		</index>
 	</table>
 
 	<!-- ACL to ARO Group Map Table -->
@@ -466,6 +471,7 @@
 		</index>
 		<index name="value_axo_groups">
 			<col>value</col>
+			<UNIQUE/>
 		</index>
 		<index name="lft_rgt_axo_groups">
 			<col>lft</col>
@@ -485,6 +491,10 @@
 			<NOTNULL/>
 			<KEY/>
 		</field>
+		<index name="axo_id">
+			<descr>Index on axo_id</descr>
+			<col>axo_id</col>
+		</index>
 	</table>
 
 	<!-- ACL to AXO Group Map Table -->
