@@ -25,7 +25,7 @@ if (!(defined('ADODB_DIR'))) {
 	define('ADODB_DIR', DP_BASE_DIR . '/lib/adodb');
 }
 
-define( 'GACL_PREFIX', 'dotp_gacl_' );
+define( 'GACL_PREFIX', 'gacl_' );
 
 //Include the PHPGACL library
 require_once DP_BASE_DIR . '/lib/phpgacl/gacl.class.php';
@@ -51,7 +51,7 @@ class dPacl extends gacl_api {
 		}
 		
 		if ( empty( $this->_db_table_prefix ) )
-			$this->_db_table_prefix = 'gacl_';
+			$this->_db_table_prefix = GACL_PREFIX;
 		
 		$this->_original_db_prefix = $this->_db_table_prefix;	
 		
