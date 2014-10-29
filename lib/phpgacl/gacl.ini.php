@@ -15,10 +15,10 @@ debug 			= FALSE
 ;
 db_type 		= "mysql"
 db_host			= "localhost"
-db_user			= "dbuser"
-db_password		= "OceanC982*"
-db_name			= "dotproject"
-db_table_prefix	= "dotp_gacl_"
+db_user			= ""
+db_password		= ""
+db_name			= ""
+db_table_prefix		= "gacl_"
 
 ;
 ;Caching
