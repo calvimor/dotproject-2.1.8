@@ -5,7 +5,7 @@ $allowedCompanies = getAllowedCompanies();
 $allowedProjects = getAllowedProjects();
 $ipr = dPgetSysVal( 'HelpDeskPriority' );
 $ist = dPgetSysVal( 'HelpDeskStatus' );
-
+die(__FILE__);
 $dbPrefix = dPgetConfig('dbprefix');
 
 $AppUI->savePlace();
@@ -59,7 +59,7 @@ if($HELPDESK_CONFIG['search_criteria_search']){
 	}
   
   $search =$AppUI->getState( 'HelpDeskSearch' ) !== null ? $AppUI->getState( 'HelpDeskSearch' ) : '';
-  //echo "<br>".$search."<br>";
+  echo "<br>".$search."<br>";
   if(strlen(trim($search))>0){
         $tarr[] = "(lower(hi.item_title) LIKE lower('%$search%')
                     OR lower(hi.item_summary) LIKE lower('%$search%'))";
@@ -282,7 +282,6 @@ if($HELPDESK_CONFIG['search_criteria_project']){
 	if (isset( $_GET['project'] )) {
 		$AppUI->setState( 'HelpDeskProject', $_GET['project'] );
 	}
-
 	if (empty($_REQUEST['project_id'])) {
 		$project = $AppUI->getState( 'HelpDeskProject' ) !== null ? $AppUI->getState( 'HelpDeskProject' ) : -1;
 	} else {
@@ -384,7 +383,7 @@ if (count( $tarr )) {
 	
 	/* Looks like there's only 1 record */
 	//$starr	= $tarr[0];
-	//var_dump($tarr);
+	
 	
 	if ( strstr( $tarr[0], "|" ) ){
 		
@@ -417,7 +416,8 @@ $sql = "SELECT hi.*,
         LEFT JOIN " . $dbPrefix . "projects p ON p.project_id = hi.item_project_id
         WHERE $where
         ORDER BY ";
-
+echo $sql;
+die();
 // Do custom order by if needed, default at the end
 if ($orderby == "project_name") {
   $sql .= "p.project_name";

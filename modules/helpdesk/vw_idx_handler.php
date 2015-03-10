@@ -7,7 +7,8 @@
    */
 function vw_idx_handler ($type) {
   global $m, $ipr, $ist, $AppUI, $dbPrefix;
-
+echo "DBPREFIX=$dbPrefix";
+die(__FUNCTION__);
   $where = $date_field_name = $date_field_title = "";
 
   switch($type){

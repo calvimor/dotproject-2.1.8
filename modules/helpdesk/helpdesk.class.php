@@ -81,8 +81,7 @@ class CHelpDeskItem extends CDpObject {
   var $item_deadline =NULL;
   
   function CHelpDeskItem() {
-  //  $this->CDpObject( 'helpdesk_items', 'item_id' );
-
+  
 		$table	= 'helpdesk_items';
 		$key 	= 'item_id';
 		$perm_name = '';
@@ -94,9 +93,9 @@ class CHelpDeskItem extends CDpObject {
   
   }
 
-
   function check() {
     if ($this->item_id === NULL) {
+
 //Had to remove this check or else we couldn't add tasklogs
 //      return ("$AppUI->_('Help Desk Item ID is NULL')");
     }

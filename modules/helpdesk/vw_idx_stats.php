@@ -40,7 +40,7 @@ foreach ($ict as $k => $v) {
 
 		foreach ($ist as $kst => $vst) {
 			$s .= "<td align=\"center\"><a href=\"?m=helpdesk&a=list&item_calltype={$kct}&item_status=$kst\">"
-          . @$stats[$kct][$kst]
+          . $stats[$kct][$kst]
           . "</a></td>";
 		}
 
