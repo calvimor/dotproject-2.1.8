@@ -1,0 +1,26 @@
+This is an instruction on how to install/upgrade the helpdesk module
+Kang Zhao.  kang@linuxbox.com
+The LinuxBox Corp, Ann Arbor, MI 48104, USA.
+
+1) Ensure that you have a current backup of your current dotProject database. This step isn't strictly needed but is never a bad idea.
+
+2) Untar the downloaded compressed file and place the "helpdesk" folder in the "module" folder of your dotproject directory.
+
+3) Go to "System Admin-->View Modules", you should be able to see a list of modules, including the Helpdesk.
+
+4) For upgraders only: the line for the Helpdesk should have been marked with a green button. Please click on the "upgrade" link.
+
+5) For new users only: the line for the Helpdesk should have been marked with a grey button. Please click on the "install" link (the only link available 
+for the Helpdesk at this moment). Then, the Helpdesk should have a green button. 
+
+6) If you see a blinking yellow button for the Helpdesk, please click on the "disabled" link. If you see a blinking red button for the Helpdesk, please 
+click on the "hidden" link in the rightmost column.
+
+7) In order to create helpdesk items from emails, it is necessary to configure the "newgateway.pl" manually. Please refer to the comments in the 
+script (mainly in the "System Setting Section" and the "Configuration Section").
+   You may also have to configure your mail server to pipe emails to the perl script. For example, you can add a new alias in "/etc/aliases" by adding 
+   the following line: (we assume you use support@yourcompany.com as the address to receive and send helpdesk items emails).
+   
+    support: "|/your_helpdesk_directory/newgateway.pl /your_dotproject_direcotory/includes/config.php /your_helpdesk_directory/config.php".
+
+Now, you are good to go!

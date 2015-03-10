@@ -1,0 +1,38 @@
+﻿Features included in this upgrade: 
+
+ 1.Add deadlines to help desk items;
+ 2.Display the (calculated) time elapsed since a help desk item was created or updated, and the time left before the deadline of items. 
+ a)This information is shown next to the actual dates when viewing individual items.
+ b)At the list view of items, this information will be displayed when moving mouse over the time.
+ 3. Add filters of user/company/project lists.
+ a)The filters are used when adding or editing a help desk item. For example Assume the dP system is hosted by company A) and company A is hosting for companies B & C.
+ b) If the current user is an internal employee of company A, he/she can select any active user(s) in the requestor, assignee, watcher drop down tables;  they can also pick any active (status=in progress) company/project in the dP system.
+ c) If the current user is from company B, he/she can only see active users from company A (the host) and company B, and company B projects, unless he/she is assigned the privilege to view information about another companies by system administrators.  Company B users may not see company C users or projects 
+ 4.Modify the sending of notification emails.
+ a) If users choose the "No" "Email Notification" radio button, no emails will be sent to anyone (including requestor, assignee and watchers) when the item is created or updated.
+ 5. Modify the format of notification emails.
+ a) The emails are sent in both plain text and HTML.
+ 6. Add more configuration options for help desk module.
+ a)Administrators can configure default notification sending option, the notification email subject/header, and the sender of the emails in the "Notification Email Options" section.
+ b)"Default Assigned To" is used to specify the default user, to whom a help desk item is assigned when being created.
+ c)"Use Default Watcher(s)" and "Default Watchers" specify whether to use default watchers when a help desk item is created and who should be the default watchers.
+ 7. Integrate TicketSmith module into help desk so that clients/customers can create help desk items by sending emails to certain address.
+ a) The title, requestor, company, call source and summary will automatically be filled by extracting information from emails and relate them to dP database.
+ b)If the incoming email is from an address that is not stored in the database, "Unknown" are used as requestor and company.
+ 8. Add new feature to export a help desk item into a task.
+ a)Pre-requisite: the help desk item must be open, and is associated with a project.
+ b)The exportation will create a new task with name, project, start/ending date, priority, owner, creator and description.
+ c) After the exportation, the item will be closed.  But a link to the newly created task will be added to the item summary for reference. Similarly, in the description of the newly created task, there will also be a link to the original help desk item.
+ 9.In the list view of help desk items, preserve the user's input in the "Search" field, just like other fields such as "Priority", "Status" , etc.
+ 10. Change the way a client (a user from outside the host company) creates a help desk item:
+ a) Clients cannot change default fields like  "Assign to", "Email Notification" and "Watchers".  
+ b)When using staff member(s) from the host company as default watchers, the host company can always track the items created by clients through email notifications about the creation of the item.
+ 11. Other bugs that have been fixed:
+ a) At the "Tabbed view" of help desk module, the number of items on the tab is sometimes inconsistent with the number of actual items shown under the tab.
+ b)Notification emails to watchers are sometimes missing.
+ c)The confirmation message "Help Desk Item Help Desk Item updated" after editing an item.
+ d)Cost codes are disabled in help desk task logs.
+ e)Integrate/modify report function.
+ f)Adjust the column width for the table that shows help desk items statistics in the help desk module index page.
+ g)When creating a help desk item, only active projects are available for selections in the "Projects" scroll-menu.
+ h)In the list view of help desk items, preserve the search text that users entered, in a way similar to how the "Assigned To" is preserved.

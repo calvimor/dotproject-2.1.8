@@ -1,0 +1,11 @@
+   
+Version 2.1.8 mid-november 2014
+
+	-	AdoDB upgraded to 5.19, 
+	- 	PhpGacl upgraded to 3.3.7 and uses AdoDB 5.19
+	-	PEAR package upgraded to latest
+		Removal of TicketSmith and installation of Dotproject HelpDesk module	
+		Code review and misc. adjustments to Dotproject re: deprecated issues, PEAR dates issues, multiple corrections to  
+		remove Php notices and warnings. 
+	-	Some tweaks to the Forum module.
+	    
