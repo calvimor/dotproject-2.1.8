@@ -1,12 +1,6 @@
 <?php /* $Id: fileviewer.php 6201 2013-01-15 06:41:50Z ajdonnison $ */
 
 /*
-All files in this work, except the modules/ticketsmith directory, are now
-covered by the following copyright notice.  The ticketsmith module is
-under the Voxel Public License.  See modules/ticketsmith/LICENSE
-for details.  Please note that included libraries in the lib directory
-may have their own license.
-
 Copyright (c) 2003-2005 The dotProject Development Team <core-developers@dotproject.net>
 
     This file is part of dotProject.
