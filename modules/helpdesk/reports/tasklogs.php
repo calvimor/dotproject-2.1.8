@@ -3,6 +3,8 @@
 * Generates a report of the task logs for given dates
 */
 //error_reporting( E_ALL );
+$dbPrefix = dPgetConfig('dbprefix');
+
 $perms =& $AppUI->acl();
 if (! $perms->checkModule('task_log', 'view'))
 	$AppUI->redirect('m=public&a=access_denied');
@@ -96,8 +98,8 @@ function setCalendar( idate, fdate ) {
 	<?php
 		$usersql = "
 		SELECT user_id, user_username, contact_first_name, contact_last_name
-		FROM users
-                LEFT JOIN contacts ON user_contact = contact_id
+		FROM " . $dbPrefix . "users
+                LEFT JOIN " . $dbPrefix . "contacts ON user_contact = contact_id
 		";
 
 		if ( $log_userfilter == 0 ) echo '<OPTION VALUE="0" SELECTED>'.$AppUI->_('All users' );
@@ -145,13 +147,13 @@ function setCalendar( idate, fdate ) {
 if ($do_report) {
 
 	$sql = "SELECT t.*, item_id, CONCAT_WS(' ',contact_first_name,contact_last_name) AS creator, billingcode_value, ROUND((billingcode_value * t.task_log_hours), 2) AS amount"
-		."\nFROM task_log AS t"
-		."\nLEFT JOIN helpdesk_items AS ts ON ts.item_id = task_log_help_desk_id"
-		."\nLEFT JOIN users AS u ON user_id = task_log_creator"
-                ."\nLEFT JOIN contacts ON user_contact = contact_id"
-		."\nLEFT JOIN projects ON project_id = item_project_id"
-		."\nLEFT JOIN companies AS c ON c.company_id = item_company_id"
-		."\nLEFT JOIN billingcode ON billingcode_id = task_log_costcode"
+		."\nFROM " . $dbPrefix . "task_log AS t"
+		."\nLEFT JOIN " .  $dbPrefix . "helpdesk_items AS ts ON ts.item_id = task_log_help_desk_id"
+		."\nLEFT JOIN " .$dbPrefix . "users AS u ON user_id = task_log_creator"
+                ."\nLEFT JOIN " . $dbPrefix . "contacts ON user_contact = contact_id"
+		."\nLEFT JOIN " . $dbPrefix . "projects ON project_id = item_project_id"
+		."\nLEFT JOIN " . $dbPrefix . "companies AS c ON c.company_id = item_company_id"
+		."\nLEFT JOIN " . $dbPrefix . "billingcode ON billingcode_id = task_log_costcode"
 		."\nWHERE task_log_task = 0 AND task_log_help_desk_id > 0";
 //	if (!$log_allprojects)
 //	{
@@ -271,7 +273,7 @@ if ($do_report) {
 	if ($log_pdf) {
 	// make the PDF file
 		 if ($project_id){
-			$sql = "SELECT project_name FROM projects WHERE project_id=$project_id";
+			$sql = "SELECT project_name FROM " . $dbPrefix . "projects WHERE project_id=$project_id";
 			$pname = 'Project: '.db_loadResult( $sql );
 		}
 		else
@@ -279,7 +281,7 @@ if ($do_report) {
 		echo db_error();
 
 		if ($company_id){
-			$sql = "SELECT company_name FROM companies WHERE company_id=$company_id";
+			$sql = "SELECT company_name FROM " . $dbPrefix . "companies WHERE company_id=$company_id";
 			$cname = 'Company: '.db_loadResult( $sql );
 		}
 		else

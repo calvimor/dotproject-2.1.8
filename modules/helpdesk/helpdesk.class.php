@@ -8,9 +8,9 @@ include_once("./modules/helpdesk/config.php");
 require_once $AppUI->getSystemClass('date');
 
 // Make sure we can read the module
-if (getDenyRead($m)) {
-	$AppUI->redirect( "m=public&a=access_denied" );
-}
+//if (getDenyRead($m)) {
+	//$AppUI->redirect( "m=public&a=access_denied" );
+//}
 
 // Define log types
 define("STATUS_LOG", 1);

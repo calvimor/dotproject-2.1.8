@@ -138,16 +138,19 @@ function setCalendar( idate, fdate ) {
 </table>
 
 <?php
+
+$dbPrefix = dPgetConfig('dbprefix');
+
 if ($do_report) {
 	
 	$sql =  "SELECT   hi.*"                                                                  . "\n"
 	.	",        concat(rc.contact_first_name, ' ', rc.contact_last_name) requested_by" . "\n"
 	.	",        concat(ac.contact_first_name, ' ', ac.contact_last_name) assigned_to"	 . "\n"
-	.	"FROM     helpdesk_items       hi"                                               . "\n"
-	.	",        users                ru"                                               . "\n"
-	.	",        contacts             rc"                                               . "\n"
-	.	",        users                au"                                               . "\n"
-	.	",        contacts             ac"                                               . "\n";
+	.	"FROM     " . $dbPrefix . "helpdesk_items       hi"                                               . "\n"
+	.	",        " . $dbPrefix . "users                ru"                                               . "\n"
+	.	",        " . $dbPrefix . "contacts             rc"                                               . "\n"
+	.	",        " . $dbPrefix . "users                au"                                               . "\n"
+	.	",        " . $dbPrefix . "contacts             ac"                                               . "\n";
 if ($project_id) {
 	$sql.="WHERE    (hi.item_project_id = $project_id"                                     . "\n"
 	.	"OR       hi.item_project_id = hi.item_project_id)"                              . "\n"
@@ -205,7 +208,7 @@ if ($project_id) {
 		$sql_stmt = "SELECT TRIM(SUBSTRING_INDEX(SUBSTRING(sysval_value, LOCATE('"
 		.           $Tasks['item_status'] . "|', sysval_value) + 2), '\\n', 1)) item_status_desc"
 		.           "\n"
-		.           "FROM   sysvals"
+		.           "FROM   " . $dbPrefix . "sysvals"
 		.           "\n"
 		.           "WHERE  sysval_title ='HelpDeskStatus'";
 
@@ -236,7 +239,7 @@ if ($project_id) {
 		$sql_stmt = "SELECT TRIM(SUBSTRING_INDEX(SUBSTRING(sysval_value, LOCATE('"
 		.           $Tasks['item_status'] . "|', sysval_value) + 2), '\\n', 1)) item_priority_desc"
 		.           "\n"
-		.           "FROM   sysvals"
+		.           "FROM   " . $dbPrefix . "sysvals"
 		.           "\n"
 		.           "WHERE  sysval_title ='HelpDeskPriority'";
 
@@ -268,9 +271,9 @@ if ($project_id) {
 		$sql_stmt = "SELECT   tl.task_log_date"        . "\n"
 		.           ",        tl.task_log_description" . "\n"
 		.           ",        concat(rc.contact_first_name, ' ', rc.contact_last_name) created_by" . "\n"
-		.           "FROM     task_log tl"             . "\n"
-		.           ",        users                ru"                                               . "\n"
-		.           ",        contacts             rc"                                               . "\n"
+		.           "FROM     " . $dbPrefix . "task_log tl"             . "\n"
+		.           ",        " . $dbPrefix . "users                ru"                                               . "\n"
+		.           ",        " . $dbPrefix . "contacts             rc"                                               . "\n"
 		.           "WHERE    tl.task_log_help_desk_id = " . $Tasks['item_id'] . "\n"
 		.           "AND      ru.user_id         = tl.task_log_creator"                             . "\n"
 		.           "AND      rc.contact_id      = ru.user_contact"                                  . "\n"
@@ -312,7 +315,7 @@ if ($project_id) {
 	echo "</table>";
 if ($log_pdf) {
 	// make the PDF file
-		$sql = "SELECT project_name FROM projects WHERE project_id=$project_id";
+		$sql = "SELECT project_name FROM " . $dbPrefix . "projects WHERE project_id=$project_id";
 		$pname = db_loadResult( $sql );
 		echo db_error();
 

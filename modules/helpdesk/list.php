@@ -5,7 +5,7 @@ $allowedCompanies = getAllowedCompanies();
 $allowedProjects = getAllowedProjects();
 $ipr = dPgetSysVal( 'HelpDeskPriority' );
 $ist = dPgetSysVal( 'HelpDeskStatus' );
-die(__FILE__);
+
 $dbPrefix = dPgetConfig('dbprefix');
 
 $AppUI->savePlace();
@@ -380,28 +380,7 @@ if($HELPDESK_CONFIG['search_criteria_requestor']){
 $where = getItemPerms();
 
 if (count( $tarr )) {
-	
-	/* Looks like there's only 1 record */
-	//$starr	= $tarr[0];
-	
-	
-	if ( strstr( $tarr[0], "|" ) ){
-		
-		$fix	= explode( "|", $tarr[0] );
-		//var_dump($fix);
-		//echo $fix[1];
-	//	die('WWWWWWWWWWWWWWWWWWWWWWWW');
-		unset( $tarr );
-		$tarr[] = $fix[0] . "|" . '"' . $fix[1] . '"';
-	
-		//$starr = implode("\n AND ", $tarrr) . "<br>";
-	}
-
-//	echo $fix[0] . "|" . '"' . $fix[1] . '"';
-	
-	$where .=  ' AND ('.implode("\n AND ", $tarr).') ';
-	//echo $where;
-	//die();
+        $where .=  'AND ('.implode("\n AND ", $tarr).') ';
 }
 
 $sql = "SELECT hi.*,
@@ -416,8 +395,6 @@ $sql = "SELECT hi.*,
         LEFT JOIN " . $dbPrefix . "projects p ON p.project_id = hi.item_project_id
         WHERE $where
         ORDER BY ";
-echo $sql;
-die();
 // Do custom order by if needed, default at the end
 if ($orderby == "project_name") {
   $sql .= "p.project_name";
