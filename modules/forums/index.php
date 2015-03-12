@@ -55,8 +55,7 @@ $q->addJoin('forum_visits', 'v', "visit_user = $AppUI->user_id AND visit_forum =
 $project->setAllowedSQL($AppUI->user_id, $q);
 $forum->setAllowedSQL($AppUI->user_id, $q);
 
-
-$q->addWhere("user_id = forum_owner AND project_id = forum_project");
+//$q->addWhere("user_id = forum_owner AND project_id = forum_project");
 
 switch ($f) {
 	case 1:
