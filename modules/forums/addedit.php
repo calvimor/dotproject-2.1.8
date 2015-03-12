@@ -2,7 +2,7 @@
 if (!defined('DP_BASE_DIR')) {
   die('You should not access this file directly.');
 }
-
+$AppUI->savePlace();
 // Add / Edit forum
 
 $forum_id = intval(dPgetParam($_GET, 'forum_id', 0));
@@ -162,7 +162,7 @@ function delIt() {
 
   </div>
       <textarea class="ckeditor" id="textarea" placeholder="Enter text ..." name="forum_description" style="height:150px;" rows="14" cols="60">
-            <?php echo @$forum_info["forum_description"];?></textarea>
+            <?php echo $forum_info["forum_description"];?></textarea>
    </td>
 </tr>
 
