@@ -67,7 +67,7 @@ $perms->add_object('app', 'Projects', 'projects', 9, 0, 'axo');
 $perms->add_object('app', 'System Administration', 'system', 10, 0, 'axo');
 $perms->add_object('app', 'Tasks', 'tasks', 11, 0, 'axo');
 $perms->add_object('app', 'Task Logs', 'task_log', 11, 0, 'axo');
-$perms->add_object('app', 'Tickets', 'ticketsmith', 12, 0, 'axo');
+$perms->add_object('app', 'Helpdesk', 'helpdesk', 12, 0, 'axo');
 $perms->add_object('app', 'Public', 'public', 13, 0, 'axo');
 $perms->add_object('app', 'Roles Administration', 'roles', 14, 0, 'axo');
 $perms->add_object('app', 'User Table', 'users', 15, 0, 'axo');
@@ -87,7 +87,7 @@ $perms->add_group_object($all_mods, 'app', 'projects', 'axo');
 $perms->add_group_object($all_mods, 'app', 'system', 'axo');
 $perms->add_group_object($all_mods, 'app', 'tasks', 'axo');
 $perms->add_group_object($all_mods, 'app', 'task_log', 'axo');
-$perms->add_group_object($all_mods, 'app', 'ticketsmith', 'axo');
+$perms->add_group_object($all_mods, 'app', 'helpdesk', 'axo');
 $perms->add_group_object($all_mods, 'app', 'public', 'axo');
 $perms->add_group_object($all_mods, 'app', 'roles', 'axo');
 $perms->add_group_object($all_mods, 'app', 'users', 'axo');
@@ -111,7 +111,7 @@ $perms->add_group_object($non_admin_mods, 'app', 'help', 'axo');
 $perms->add_group_object($non_admin_mods, 'app', 'projects', 'axo');
 $perms->add_group_object($non_admin_mods, 'app', 'tasks', 'axo');
 $perms->add_group_object($non_admin_mods, 'app', 'task_log', 'axo');
-$perms->add_group_object($non_admin_mods, 'app', 'ticketsmith', 'axo');
+$perms->add_group_object($non_admin_mods, 'app', 'helpdesk', 'axo');
 $perms->add_group_object($non_admin_mods, 'app', 'public', 'axo');
 
 // Assign default permissions
