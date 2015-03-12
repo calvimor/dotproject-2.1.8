@@ -195,11 +195,18 @@ echo $AppUI->_('Show captions');?></label>
 echo (($showInactive==1) ? 'checked="checked"' : "");?> /><label for="showInactive"><?php 
 echo $AppUI->_('Show Archived');?></label>
 			</td>
+
 			<td valign="top">
 				<input type="checkbox" value='1' name="showAllGantt" id="showAllGantt" <?php 
 echo (($showAllGantt==1) ? 'checked="checked"' : "");?> /><label for="showAllGantt"><?php 
 echo $AppUI->_('Show Tasks');?></label>
 			</td>
+ <td valign="top">
+                                <input type="checkbox" value='1' name="taskPin" id="taskPin" <?php
+echo (($taskPin==1) ? 'checked="checked"' : "");?> /><label for="taskPin"><?php
+echo $AppUI->_('Show Pinned');?></label>
+                        </td>
+
 			<td valign="top">
 				<input type="checkbox" value='1' name="sortTasksByName" id="sortTasksByName" <?php 
 echo (($sortTasksByName==1) ? 'checked="checked"' : "");?> /><label for="sortTasksByName"><?php 
