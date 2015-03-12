@@ -80,8 +80,8 @@ function getPermission($mod, $perm, $item_id = 0) {
 	$dbprefix = dPgetConfig('dbprefix', '');
 	
 	// First check if the module is readable, i.e. has view permission.
-	$result = $perms->checkModuleItem($mod, $perm, $item_id);
-	
+	$result = (bool)$perms->checkModuleItem($mod, $perm, $item_id);
+
 	// We need to check if we are allowed to view in the parent module item.  
 	// This can be done a lot better in PHPGACL, but is here for compatibility.
 	if ($item_id && $perm == 'view') {
@@ -99,6 +99,7 @@ function getPermission($mod, $perm, $item_id = 0) {
 			$result = $result && getPermission('companies', $perm, $company_id);
 		}
 	}
+
 	return $result;
 }
 
