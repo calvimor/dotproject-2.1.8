@@ -2,11 +2,6 @@
 	// $Id: queuescanner.php 6192 2013-01-05 12:31:23Z ajdonnison $
 
 /*
-All files in this work, except the modules/ticketsmith directory, are now
-covered by the following copyright notice.  The ticketsmith module is
-under the Voxel Public License.  See modules/ticketsmith/LICENSE
-for details. Please note that included libraries in lib may have their
-own license.
 
 Copyright (c) 2003-2005 The dotProject Development Team <core-developers@dotproject.net>
 
