@@ -1,10 +1,5 @@
 <?php // $Id: index.php 4791 2007-02-26 21:04:48Z merlinyoda $
 /*
-All files in this work, except the modules/ticketsmith directory, are now
-covered by the following copyright notice.  The ticketsmith module is
-under the Voxel Public License.  See modules/ticketsmith/LICENSE
-for details.  Please note that included libraries in the lib directory
-may have their own license.
 
 Copyright (c) 2003-2005 The dotProject Development Team <core-developers@dotproject.net>
 
