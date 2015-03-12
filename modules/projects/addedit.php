@@ -257,7 +257,9 @@ function setDepartment(department_id_string) {
 
 </script>
 
-<form name="editFrm" action="?m=projects" enctype="multipart/form-data" method="post">
+<form name="editFrm" action="" enctype="multipart/form-data" method="post">
+	<input type="hidden" name="m" value="projects" />
+	<input type="hidden" name="a" value="view" />
 	<input type="hidden" name="dosql" value="do_project_aed" />
 	<input type="hidden" name="project_id" value="<?php echo $project_id;?>" />
 	<input type="hidden" name="project_creator" value="<?php echo $AppUI->user_id;?>" />
