@@ -139,10 +139,21 @@ if (isset($_REQUEST['login'])) {
 // set the default ui style
 $uistyle = (($AppUI->getPref('UISTYLE')) ? $AppUI->getPref('UISTYLE') : dPgetConfig('host_style'));
 
+// bring in the rest of the support and localisation files
+require_once (DP_BASE_DIR . '/includes/permissions.php');
+
 // clear out main url parameters
-$m = '';
 $a = '';
 $u = '';
+$m = '';
+
+/* Trying to Patch the routing - stumbling on inconsistencies...  */
+if ( !empty( $_POST['m'] ) ){
+	$m = $AppUI->checkFileName(dPgetCleanParam($_POST, 'm', getReadableModule())); //$_POST['m'];
+	$a = $AppUI->checkFileName(dPgetCleanParam($_POST, 'a', $def_a));
+}elseif ( ! empty( $_GET['m'] ) ){
+	$m = $AppUI->checkFileName(dPgetCleanParam($_GET, 'm', getReadableModule())); //$_GET['m'];
+}
 
 // check if we are logged in
 if ($AppUI->doLogin()) {
@@ -172,22 +183,21 @@ $AppUI->setUserLocale();
 /* date class sets the default start day which comes from the locale */
 require_once($AppUI->getSystemClass('date'));
 
-
-// bring in the rest of the support and localisation files
-require_once (DP_BASE_DIR . '/includes/permissions.php');
-
-
 $def_a = 'index';
-if (!(isset($_GET['m']) || empty($dPconfig['default_view_m']))) {
+
+if ( empty( $m ) || empty($dPconfig['default_view_m'] ) ) {
+
   	$m = $dPconfig['default_view_m'];
 	$def_a = ((!empty($dPconfig['default_view_a'])) ? $dPconfig['default_view_a'] : $def_a);
+	$a = $AppUI->checkFileName(dPgetCleanParam($_GET, 'a', $def_a));
 	$tab = $dPconfig['default_view_tab'];
+		
 } else {
-	// set the module from the url
-	$m = $AppUI->checkFileName(dPgetCleanParam($_GET, 'm', getReadableModule()));
+
+	if ( empty( $a ) )
+		$a = $AppUI->checkFileName(dPgetCleanParam($_GET, 'a', $def_a));
+
 }
-// set the action from the url
-$a = $AppUI->checkFileName(dPgetCleanParam($_GET, 'a', $def_a));
 
 /* This check for $u implies that a file located in a subdirectory of higher depth than 1
  * in relation to the module base can't be executed. So it would'nt be possible to
@@ -195,7 +205,6 @@ $a = $AppUI->checkFileName(dPgetCleanParam($_GET, 'a', $def_a));
  * Also it won't be possible to run modules/module/abc.zyz.class.php for that dots are
  * not allowed in the request parameters.
 */
-
 $u = $AppUI->checkFileName(dPgetCleanParam($_GET, 'u', ''));
 
 // load module based locale settings
@@ -297,7 +306,8 @@ if (!(isset($_SESSION['all_tabs'][$m]))) {
 }
 
 $module_file = (DP_BASE_DIR . '/modules/' . $m . '/' . (($u) ? ($u.'/') : '') . $a . '.php');
-if (file_exists($module_file)) {
+
+if (file_exists($module_file)) { 
 	require $module_file;
 } else {
 	//TODO: make this part of the public module? 
@@ -307,6 +317,7 @@ if (file_exists($module_file)) {
 	
 	echo $AppUI->_('Missing file. Possible Module "' . $m . '" missing!');
 }
+
 // wtf??  why?
 if (!$suppressHeaders) {
 	echo ('<iframe name="thread" src="' . DP_BASE_URL 
