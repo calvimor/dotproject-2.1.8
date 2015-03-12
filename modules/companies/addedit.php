@@ -80,7 +80,9 @@ function testURL(x) {
 }
 </script>
 
-<form name="changeclient" action="?m=companies" method="post">
+<form name="changeclient" action="" method="post">
+	<input type="hidden" name="m" value="companies" />
+	<input type="hidden" name="a" value="view" />
 	<input type="hidden" name="dosql" value="do_company_aed" />
 	<input type="hidden" name="company_id" value="<?php echo dPformSafe($company_id); ?>" />
 <table cellspacing="1" cellpadding="1" border="0" width='100%' class="std" summary="add/edit company">

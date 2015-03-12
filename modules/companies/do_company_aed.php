@@ -19,7 +19,7 @@ $AppUI->setMsg('Company');
 if ($del) {
 	if (!$obj->canDelete($msg)) {
 		$AppUI->setMsg($msg, UI_MSG_ERROR);
-		$AppUI->redirect();
+	//	$AppUI->redirect();
 	}
 	
 	if (($msg = $obj->delete())) {
@@ -39,6 +39,6 @@ else {
  		$sql = $custom_fields->store($obj->company_id); // Store Custom Fields
 		$AppUI->setMsg(((@$_POST['company_id']) ? 'updated' : 'added'), UI_MSG_OK, true);
 	}
-	$AppUI->redirect();
+//	$AppUI->redirect();
 }
 ?>
