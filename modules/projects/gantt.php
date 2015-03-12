@@ -25,7 +25,7 @@ $sortTasksByName = (int)dPgetParam($_REQUEST, 'sortTasksByName', 0);
 $addPwOiD = (int)dPgetParam($_REQUEST, 'addPwOiD', 0);
 $m_orig = dPgetCleanParam($_REQUEST, 'm_orig', $m);
 $a_orig = dPgetCleanParam($_REQUEST, 'a_orig', $a);
-
+$taskPin = dPgetCleanParam($_REQUEST, 'taskPin', $a); 
 
 $projectStatus = dPgetSysVal('ProjectStatus');
 $projectStatus = arrayMerge(array('-2' => $AppUI->_('All w/o in progress'), 
@@ -64,7 +64,9 @@ $q->addQuery('DISTINCT p.project_id, project_color_identifier, project_name, pro
              . $working_hours . ', task_duration_type)) AS project_percent_complete' 
              . ', project_status');
 $q->addJoin('tasks', 't1', 'p.project_id = t1.task_project');
+$q->addJoin('user_task_pin','tp','t1.task_id = tp.task_id' );
 $q->addJoin('companies', 'c1', 'p.project_company = c1.company_id');
+
 if ($department > 0) {
 	$q->addJoin('project_departments', 'pd', 'pd.project_id = p.project_id');
 	
@@ -91,6 +93,10 @@ if ($proFilter == '-4') {
 
 if ($user_id && $m_orig == 'admin' && $a_orig == 'viewuser') {
 	$q->addWhere('project_owner = ' . $user_id);
+}
+$taskPin =1;
+if ($taskPin == '1') {
+	$q->addWhere('tp.task_pinned = 1');
 }
 
 if ($showInactive != '1') {
