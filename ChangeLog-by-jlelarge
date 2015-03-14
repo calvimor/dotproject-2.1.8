@@ -12,7 +12,6 @@ Update 2.1.8 mid-march 2015
 			- the smartsearch module in incomplete
 			
 	-	Updated the dotproject.sql base file
-	-	Removed many redirect() calls - they proved unnecessary
         -	Fixed generic routing bug when posting - no more redirection to Day View after posting in major modules 
 
 	  
