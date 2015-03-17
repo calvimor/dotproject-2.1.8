@@ -1,8 +1,8 @@
 
 Update 2.1.8 mid-march 2015
 
-	-	THE INSTALLATION PROCESS IS BROKEN - REQUIRES SOME SKILLS TO GET UP AND RUNNING
-
+	-	Disabled upgrade_permissions.php on new installation - phpgacl is misbehaving
+		further testing required
 	-	Removed TicketSmith code and database tables
 	-	Installed the Helpdesk from linuxbox.com
 	-	Code reviewed and corrected the Helpdesk 
@@ -20,7 +20,6 @@ Version 2.1.8 mid-november 2014
 	-	AdoDB upgraded to 5.19, 
 	- 	PhpGacl upgraded to 3.3.7 and uses AdoDB 5.19
 	-	PEAR package upgraded to latest
-	-	Removal of TicketSmith and installation of Dotproject HelpDesk module ( using table prefix: dotp_ - unfortunately hard coded )	
 	-	Code review and misc. adjustments to Dotproject re: deprecated issues, PEAR dates issues, multiple corrections to  
 		remove Php notices and warnings. 
 	-	Some tweaks to the Forum module.
