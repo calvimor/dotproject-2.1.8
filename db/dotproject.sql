@@ -8,6 +8,8 @@ CREATE TABLE `%dbprefix%billingcode` (
   PRIMARY KEY (`billingcode_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
+
+
 CREATE TABLE `%dbprefix%common_notes` (
   `note_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `note_author` int(10) unsigned NOT NULL DEFAULT '0',
@@ -24,6 +26,8 @@ CREATE TABLE `%dbprefix%common_notes` (
   `note_modified_by` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`note_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+
 
 CREATE TABLE `%dbprefix%companies` (
   `company_id` int(10) NOT NULL AUTO_INCREMENT,
@@ -45,9 +49,9 @@ CREATE TABLE `%dbprefix%companies` (
   `company_custom` longtext,
   PRIMARY KEY (`company_id`),
   KEY `idx_cpy1` (`company_owner`)
-) ENGINE=MyISAM AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=20 DEFAULT CHARSET=latin1;
 
-INSERT INTO `%dbprefix%companies` VALUES (12,0,'test cie1','','','','','','','','','',0,'test',0,NULL,NULL);
+
 
 CREATE TABLE `%dbprefix%config` (
   `config_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -61,6 +65,7 @@ CREATE TABLE `%dbprefix%config` (
 
 INSERT INTO `%dbprefix%config` VALUES (1,'host_locale','en','','text'),(2,'check_overallocation','false','','checkbox'),(3,'currency_symbol','$','','text'),(4,'host_style','default','','text'),(5,'company_name','','','text'),(6,'page_title','PPK Lab PM','','text'),(7,'site_domain','192.168.0.90:8010/dproject','','text'),(8,'email_prefix','[randd]','','text'),(9,'admin_username','admin','','text'),(10,'username_min_len','4','','text'),(11,'password_min_len','4','','text'),(12,'enable_gantt_charts','true','','checkbox'),(13,'log_changes','false','','checkbox'),(14,'check_task_dates','true','','checkbox'),(15,'check_task_empty_dynamic','false','','checkbox'),(16,'locale_warn','false','','checkbox'),(17,'locale_alert','^','','text'),(18,'daily_working_hours','8','','text'),(19,'display_debug','false','','checkbox'),(20,'link_tickets_kludge','false','','checkbox'),(21,'show_all_task_assignees','false','','checkbox'),(22,'direct_edit_assignment','false','','checkbox'),(23,'restrict_color_selection','false','','checkbox'),(24,'cal_day_view_show_minical','true','','checkbox'),(25,'cal_day_start','5','','text'),(26,'cal_day_end','22','','text'),(27,'cal_day_increment','30','','text'),(28,'cal_working_days','1,2,3,4,5,6','','text'),(29,'restrict_task_time_editing','false','','checkbox'),(30,'default_view_m','calendar','','text'),(31,'default_view_a','day_view','','text'),(32,'default_view_tab','1','','text'),(33,'index_max_file_size','-1','','text'),(34,'session_handling','php','session','select'),(35,'session_idle_time','2h','session','text'),(36,'session_max_lifetime','7d','session','text'),(37,'debug','1','','text'),(38,'parser_default','/usr/bin/strings','','text'),(39,'parser_application/msword','/usr/bin/strings','','text'),(40,'parser_text/html','/usr/bin/strings','','text'),(41,'parser_application/pdf','/usr/bin/pdftotext','','text'),(42,'files_ci_preserve_attr','true','','checkbox'),(43,'files_show_versions_edit','false','','checkbox'),(44,'auth_method','sql','auth','select'),(45,'ldap_host','localhost','ldap','text'),(46,'ldap_port','389','ldap','text'),(47,'ldap_version','3','ldap','text'),(48,'ldap_base_dn','dc=saki,dc=com,dc=au','ldap','text'),(49,'ldap_user_filter','(uid=%USERNAME%)','ldap','text'),(50,'postnuke_allow_login','true','auth','checkbox'),(51,'reset_memory_limit','32M','','text'),(52,'mail_transport','php','mail','select'),(53,'mail_host','smtp.randd','mail','text'),(54,'mail_port','25','mail','text'),(55,'mail_auth','false','mail','checkbox'),(56,'mail_user','admin@ppkl.randd.net','mail','text'),(57,'mail_pass','CdSNGC5866*','mail','password'),(58,'mail_defer','false','mail','checkbox'),(59,'mail_timeout','30','mail','text'),(60,'session_gc_scan_queue','false','session','checkbox'),(61,'task_reminder_control','false','task_reminder','checkbox'),(62,'task_reminder_days_before','1','task_reminder','text'),(63,'task_reminder_repeat','100','task_reminder','text'),(64,'gacl_cache','true','gacl','checkbox'),(65,'gacl_expire','true','gacl','checkbox'),(66,'gacl_cache_dir','/tmp','gacl','text'),(67,'gacl_timeout','600','gacl','text'),(68,'mail_smtp_tls','true','mail','checkbox'),(69,'ldap_search_user','Manager','ldap','text'),(70,'ldap_search_pass','secret','ldap','password'),(71,'ldap_allow_login','true','ldap','checkbox'),(72,'user_contact_inactivate','true','auth','checkbox'),(73,'user_contact_activate','false','auth','checkbox');
 
+
 CREATE TABLE `%dbprefix%config_list` (
   `config_list_id` int(11) NOT NULL AUTO_INCREMENT,
   `config_id` int(11) NOT NULL DEFAULT '0',
@@ -70,6 +75,7 @@ CREATE TABLE `%dbprefix%config_list` (
 ) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
 
 INSERT INTO `%dbprefix%config_list` VALUES (1,44,'sql'),(2,44,'ldap'),(3,44,'pn'),(4,34,'app'),(5,34,'php'),(6,52,'php'),(7,52,'smtp');
+
 
 CREATE TABLE `%dbprefix%contacts` (
   `contact_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -109,13 +115,18 @@ CREATE TABLE `%dbprefix%contacts` (
   KEY `idx_oby` (`contact_order_by`),
   KEY `idx_co` (`contact_company`),
   KEY `idx_prp` (`contact_project`)
-) ENGINE=MyISAM AUTO_INCREMENT=61 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=64 DEFAULT CHARSET=latin1;
+
+INSERT INTO `%dbprefix%contacts` VALUES (61,'Admin','Administrator','',NULL,NULL,NULL,'0',NULL,NULL,'admin@gmail.com',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,'obj/contact',0,0),(62,'guest','guest','',NULL,NULL,NULL,'0',NULL,NULL,'guest@gmail.com',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,'obj/contact',0,0),(63,'testlouis','louistest','',NULL,NULL,NULL,'0',NULL,NULL,'louis@gmail.com',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,'obj/contact',1,0);
+
 
 CREATE TABLE `%dbprefix%custom_fields_lists` (
   `field_id` int(11) DEFAULT NULL,
   `list_option_id` int(11) DEFAULT NULL,
   `list_value` varchar(250) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+
 
 CREATE TABLE `%dbprefix%custom_fields_struct` (
   `field_id` int(11) NOT NULL,
@@ -130,6 +141,8 @@ CREATE TABLE `%dbprefix%custom_fields_struct` (
   PRIMARY KEY (`field_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
+
+
 CREATE TABLE `%dbprefix%custom_fields_values` (
   `value_id` int(11) DEFAULT NULL,
   `value_module` varchar(30) DEFAULT NULL,
@@ -139,6 +152,8 @@ CREATE TABLE `%dbprefix%custom_fields_values` (
   `value_intvalue` int(11) DEFAULT NULL,
   KEY `idx_cfv_id` (`value_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+
 
 CREATE TABLE `%dbprefix%departments` (
   `dept_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -158,6 +173,8 @@ CREATE TABLE `%dbprefix%departments` (
   PRIMARY KEY (`dept_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=latin1 COMMENT='Department heirarchy under a company';
 
+
+
 CREATE TABLE `%dbprefix%dotpermissions` (
   `acl_id` int(11) NOT NULL DEFAULT '0',
   `user_id` varchar(80) NOT NULL DEFAULT '',
@@ -172,6 +189,7 @@ CREATE TABLE `%dbprefix%dotpermissions` (
 
 INSERT INTO `%dbprefix%dotpermissions` VALUES (33,'1','app','helpdesk','access',1,1,1),(33,'1','app','helpdesk','add',1,1,1),(33,'1','app','helpdesk','delete',1,1,1),(33,'1','app','helpdesk','edit',1,1,1),(33,'1','app','helpdesk','view',1,1,1),(12,'1','sys','acl','access',1,3,1),(16,'6','app','users','access',1,3,1),(16,'6','app','users','view',1,3,1),(11,'1','app','admin','access',1,4,1),(11,'1','app','calendar','access',1,4,1),(11,'1','app','events','access',1,4,1),(11,'1','app','companies','access',1,4,1),(11,'1','app','contacts','access',1,4,1),(11,'1','app','departments','access',1,4,1),(11,'1','app','files','access',1,4,1),(11,'1','app','file_folders','access',1,4,1),(11,'1','app','forums','access',1,4,1),(11,'1','app','help','access',1,4,1),(11,'1','app','projects','access',1,4,1),(11,'1','app','system','access',1,4,1),(11,'1','app','tasks','access',1,4,1),(11,'1','app','task_log','access',1,4,1),(11,'1','app','helpdesk','access',1,4,1),(11,'1','app','public','access',1,4,1),(11,'1','app','roles','access',1,4,1),(11,'1','app','users','access',1,4,1),(11,'1','app','history','access',1,4,1),(11,'1','app','resources','access',1,4,1),(11,'1','app','smartsearch','access',1,4,1),(11,'1','app','projectdesigner','access',1,4,1),(11,'1','app','carmina','access',1,4,1),(11,'1','','','access',1,4,1),(11,'1','app','admin','add',1,4,1),(11,'1','app','calendar','add',1,4,1),(11,'1','app','events','add',1,4,1),(11,'1','app','companies','add',1,4,1),(11,'1','app','contacts','add',1,4,1),(11,'1','app','departments','add',1,4,1),(11,'1','app','files','add',1,4,1),(11,'1','app','file_folders','add',1,4,1),(11,'1','app','forums','add',1,4,1),(11,'1','app','help','add',1,4,1),(11,'1','app','projects','add',1,4,1),(11,'1','app','system','add',1,4,1),(11,'1','app','tasks','add',1,4,1),(11,'1','app','task_log','add',1,4,1),(11,'1','app','helpdesk','add',1,4,1),(11,'1','app','public','add',1,4,1),(11,'1','app','roles','add',1,4,1),(11,'1','app','users','add',1,4,1),(11,'1','app','history','add',1,4,1),(11,'1','app','resources','add',1,4,1),(11,'1','app','smartsearch','add',1,4,1),(11,'1','app','projectdesigner','add',1,4,1),(11,'1','app','carmina','add',1,4,1),(11,'1','','','add',1,4,1),(11,'1','app','admin','delete',1,4,1),(11,'1','app','calendar','delete',1,4,1),(11,'1','app','events','delete',1,4,1),(11,'1','app','companies','delete',1,4,1),(11,'1','app','contacts','delete',1,4,1),(11,'1','app','departments','delete',1,4,1),(11,'1','app','files','delete',1,4,1),(11,'1','app','file_folders','delete',1,4,1),(11,'1','app','forums','delete',1,4,1),(11,'1','app','help','delete',1,4,1),(11,'1','app','projects','delete',1,4,1),(11,'1','app','system','delete',1,4,1),(11,'1','app','tasks','delete',1,4,1),(11,'1','app','task_log','delete',1,4,1),(11,'1','app','helpdesk','delete',1,4,1),(11,'1','app','public','delete',1,4,1),(11,'1','app','roles','delete',1,4,1),(11,'1','app','users','delete',1,4,1),(11,'1','app','history','delete',1,4,1),(11,'1','app','resources','delete',1,4,1),(11,'1','app','smartsearch','delete',1,4,1),(11,'1','app','projectdesigner','delete',1,4,1),(11,'1','app','carmina','delete',1,4,1),(11,'1','','','delete',1,4,1),(11,'1','app','admin','edit',1,4,1),(11,'1','app','calendar','edit',1,4,1),(11,'1','app','events','edit',1,4,1),(11,'1','app','companies','edit',1,4,1),(11,'1','app','contacts','edit',1,4,1),(11,'1','app','departments','edit',1,4,1),(11,'1','app','files','edit',1,4,1),(11,'1','app','file_folders','edit',1,4,1),(11,'1','app','forums','edit',1,4,1),(11,'1','app','help','edit',1,4,1),(11,'1','app','projects','edit',1,4,1),(11,'1','app','system','edit',1,4,1),(11,'1','app','tasks','edit',1,4,1),(11,'1','app','task_log','edit',1,4,1),(11,'1','app','helpdesk','edit',1,4,1),(11,'1','app','public','edit',1,4,1),(11,'1','app','roles','edit',1,4,1),(11,'1','app','users','edit',1,4,1),(11,'1','app','history','edit',1,4,1),(11,'1','app','resources','edit',1,4,1),(11,'1','app','smartsearch','edit',1,4,1),(11,'1','app','projectdesigner','edit',1,4,1),(11,'1','app','carmina','edit',1,4,1),(11,'1','','','edit',1,4,1),(11,'1','app','admin','view',1,4,1),(11,'1','app','calendar','view',1,4,1),(11,'1','app','events','view',1,4,1),(11,'1','app','companies','view',1,4,1),(11,'1','app','contacts','view',1,4,1),(11,'1','app','departments','view',1,4,1),(11,'1','app','files','view',1,4,1),(11,'1','app','file_folders','view',1,4,1),(11,'1','app','forums','view',1,4,1),(11,'1','app','help','view',1,4,1),(11,'1','app','projects','view',1,4,1),(11,'1','app','system','view',1,4,1),(11,'1','app','tasks','view',1,4,1),(11,'1','app','task_log','view',1,4,1),(11,'1','app','helpdesk','view',1,4,1),(11,'1','app','public','view',1,4,1),(11,'1','app','roles','view',1,4,1),(11,'1','app','users','view',1,4,1),(11,'1','app','history','view',1,4,1),(11,'1','app','resources','view',1,4,1),(11,'1','app','smartsearch','view',1,4,1),(11,'1','app','projectdesigner','view',1,4,1),(11,'1','app','carmina','view',1,4,1),(11,'1','','','view',1,4,1),(13,'6','app','calendar','access',1,4,1),(13,'6','app','events','access',1,4,1),(13,'6','app','companies','access',1,4,1),(13,'6','app','contacts','access',1,4,1),(13,'6','app','departments','access',1,4,1),(13,'6','app','files','access',1,4,1),(13,'6','app','file_folders','access',1,4,1),(13,'6','app','forums','access',1,4,1),(13,'6','app','help','access',1,4,1),(13,'6','app','projects','access',1,4,1),(13,'6','app','tasks','access',1,4,1),(13,'6','app','task_log','access',1,4,1),(13,'6','app','helpdesk','access',1,4,1),(13,'6','app','public','access',1,4,1),(13,'6','app','history','access',1,4,1),(13,'6','app','resources','access',1,4,1),(13,'6','app','smartsearch','access',1,4,1),(13,'6','app','projectdesigner','access',1,4,1),(13,'6','app','carmina','access',1,4,1),(13,'6','','','access',1,4,1),(13,'6','app','calendar','view',1,4,1),(13,'6','app','events','view',1,4,1),(13,'6','app','companies','view',1,4,1),(13,'6','app','contacts','view',1,4,1),(13,'6','app','departments','view',1,4,1),(13,'6','app','files','view',1,4,1),(13,'6','app','file_folders','view',1,4,1),(13,'6','app','forums','view',1,4,1),(13,'6','app','help','view',1,4,1),(13,'6','app','projects','view',1,4,1),(13,'6','app','tasks','view',1,4,1),(13,'6','app','task_log','view',1,4,1),(13,'6','app','helpdesk','view',1,4,1),(13,'6','app','public','view',1,4,1),(13,'6','app','history','view',1,4,1),(13,'6','app','resources','view',1,4,1),(13,'6','app','smartsearch','view',1,4,1),(13,'6','app','projectdesigner','view',1,4,1),(13,'6','app','carmina','view',1,4,1),(13,'6','','','view',1,4,1);
 
+
 CREATE TABLE `%dbprefix%dpversion` (
   `code_version` varchar(10) NOT NULL DEFAULT '',
   `db_version` int(11) NOT NULL DEFAULT '0',
@@ -180,6 +198,7 @@ CREATE TABLE `%dbprefix%dpversion` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 INSERT INTO `%dbprefix%dpversion` VALUES ('2.1.8',2,'2010-12-16','2011-01-06');
+
 
 CREATE TABLE `%dbprefix%event_queue` (
   `queue_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -199,6 +218,8 @@ CREATE TABLE `%dbprefix%event_queue` (
   KEY `queue_type` (`queue_type`),
   KEY `queue_origin_id` (`queue_origin_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+
 
 CREATE TABLE `%dbprefix%events` (
   `event_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -225,6 +246,8 @@ CREATE TABLE `%dbprefix%events` (
   KEY `idx_ev2` (`event_project`)
 ) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 
+
+
 CREATE TABLE `%dbprefix%file_folders` (
   `file_folder_id` int(11) NOT NULL AUTO_INCREMENT,
   `file_folder_parent` int(11) NOT NULL DEFAULT '0',
@@ -232,6 +255,8 @@ CREATE TABLE `%dbprefix%file_folders` (
   `file_folder_description` text,
   PRIMARY KEY (`file_folder_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+
 
 CREATE TABLE `%dbprefix%files` (
   `file_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -259,6 +284,8 @@ CREATE TABLE `%dbprefix%files` (
   KEY `idx_file_vid` (`file_version_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=97 DEFAULT CHARSET=latin1;
 
+
+
 CREATE TABLE `%dbprefix%files_index` (
   `file_id` int(11) NOT NULL DEFAULT '0',
   `word` varchar(50) NOT NULL DEFAULT '',
@@ -266,6 +293,8 @@ CREATE TABLE `%dbprefix%files_index` (
   PRIMARY KEY (`file_id`,`word`,`word_placement`),
   KEY `idx_fwrd` (`word`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+
 
 CREATE TABLE `%dbprefix%forum_messages` (
   `message_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -283,6 +312,8 @@ CREATE TABLE `%dbprefix%forum_messages` (
   KEY `idx_mforum` (`message_forum`)
 ) ENGINE=MyISAM AUTO_INCREMENT=151 DEFAULT CHARSET=latin1;
 
+
+
 CREATE TABLE `%dbprefix%forum_visits` (
   `visit_user` int(10) NOT NULL DEFAULT '0',
   `visit_forum` int(10) NOT NULL DEFAULT '0',
@@ -292,6 +323,8 @@ CREATE TABLE `%dbprefix%forum_visits` (
   KEY `idx_fv` (`visit_user`,`visit_forum`,`visit_message`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
+
+
 CREATE TABLE `%dbprefix%forum_watch` (
   `watch_user` int(10) unsigned NOT NULL DEFAULT '0',
   `watch_forum` int(10) unsigned DEFAULT NULL,
@@ -299,6 +332,8 @@ CREATE TABLE `%dbprefix%forum_watch` (
   KEY `idx_fw1` (`watch_user`,`watch_forum`),
   KEY `idx_fw2` (`watch_user`,`watch_topic`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='Links users to the forums/messages they are watching';
+
+
 
 CREATE TABLE `%dbprefix%forums` (
   `forum_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -318,6 +353,8 @@ CREATE TABLE `%dbprefix%forums` (
   KEY `forum_status` (`forum_status`)
 ) ENGINE=MyISAM AUTO_INCREMENT=24 DEFAULT CHARSET=latin1;
 
+
+
 CREATE TABLE `%dbprefix%gacl_acl` (
   `id` int(11) NOT NULL DEFAULT '0',
   `section_value` varchar(230) NOT NULL DEFAULT 'system',
@@ -334,6 +371,7 @@ CREATE TABLE `%dbprefix%gacl_acl` (
 
 INSERT INTO `%dbprefix%gacl_acl` VALUES (10,'user',1,1,NULL,NULL,947369906),(11,'user',1,1,NULL,NULL,947369906),(12,'user',1,1,NULL,NULL,947369906),(13,'user',1,1,NULL,NULL,947369906),(14,'user',1,1,NULL,NULL,947369906),(15,'user',1,1,NULL,NULL,947369906),(16,'user',1,1,NULL,NULL,947369906),(19,'user',1,1,NULL,NULL,1389255470),(21,'user',1,1,NULL,NULL,1389658760),(32,'user',0,0,'','',1415314927),(33,'user',1,1,NULL,NULL,1421946577);
 
+
 CREATE TABLE `%dbprefix%gacl_acl_sections` (
   `id` int(11) NOT NULL DEFAULT '0',
   `value` varchar(230) NOT NULL,
@@ -347,11 +385,13 @@ CREATE TABLE `%dbprefix%gacl_acl_sections` (
 
 INSERT INTO `%dbprefix%gacl_acl_sections` VALUES (1,'system',1,'System',0),(2,'user',2,'User',0);
 
+
 CREATE TABLE `%dbprefix%gacl_acl_seq` (
   `id` int(11) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 INSERT INTO `%dbprefix%gacl_acl_seq` VALUES (33);
+
 
 CREATE TABLE `%dbprefix%gacl_aco` (
   `id` int(11) NOT NULL DEFAULT '0',
@@ -367,6 +407,7 @@ CREATE TABLE `%dbprefix%gacl_aco` (
 
 INSERT INTO `%dbprefix%gacl_aco` VALUES (10,'system','login',1,'Login',0),(11,'application','access',1,'Access',0),(12,'application','view',2,'View',0),(13,'application','add',3,'Add',0),(14,'application','edit',4,'Edit',0),(15,'application','delete',5,'Delete',0);
 
+
 CREATE TABLE `%dbprefix%gacl_aco_map` (
   `acl_id` int(11) NOT NULL DEFAULT '0',
   `section_value` varchar(230) NOT NULL DEFAULT '0',
@@ -375,6 +416,7 @@ CREATE TABLE `%dbprefix%gacl_aco_map` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 INSERT INTO `%dbprefix%gacl_aco_map` VALUES (10,'system','login'),(11,'application','access'),(11,'application','add'),(11,'application','delete'),(11,'application','edit'),(11,'application','view'),(12,'application','access'),(13,'application','access'),(13,'application','view'),(14,'application','access'),(15,'application','access'),(15,'application','add'),(15,'application','delete'),(15,'application','edit'),(15,'application','view'),(16,'application','access'),(16,'application','view'),(19,'application','access'),(21,'application','access'),(21,'application','view'),(32,'application','access'),(33,'application','access'),(33,'application','add'),(33,'application','delete'),(33,'application','edit'),(33,'application','view');
+
 
 CREATE TABLE `%dbprefix%gacl_aco_sections` (
   `id` int(11) NOT NULL DEFAULT '0',
@@ -389,16 +431,20 @@ CREATE TABLE `%dbprefix%gacl_aco_sections` (
 
 INSERT INTO `%dbprefix%gacl_aco_sections` VALUES (10,'system',1,'System',0),(11,'application',2,'Application',0);
 
+
 CREATE TABLE `%dbprefix%gacl_aco_sections_seq` (
   `id` int(11) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 INSERT INTO `%dbprefix%gacl_aco_sections_seq` VALUES (11);
 
+
 CREATE TABLE `%dbprefix%gacl_aco_seq` (
   `id` int(11) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 INSERT INTO `%dbprefix%gacl_aco_seq` VALUES (15);
+
 
 CREATE TABLE `%dbprefix%gacl_aro` (
   `id` int(11) NOT NULL DEFAULT '0',
@@ -413,6 +459,7 @@ CREATE TABLE `%dbprefix%gacl_aro` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 INSERT INTO `%dbprefix%gacl_aro` VALUES (10,'user','1',1,'admin',0),(15,'user','6',1,'guess',0);
+
 
 CREATE TABLE `%dbprefix%gacl_aro_groups` (
   `id` int(11) NOT NULL DEFAULT '0',
@@ -429,11 +476,13 @@ CREATE TABLE `%dbprefix%gacl_aro_groups` (
 
 INSERT INTO `%dbprefix%gacl_aro_groups` VALUES (10,0,1,12,'Roles','role'),(11,10,2,3,'Administrator','admin'),(12,10,4,5,'Anonymous','anon'),(13,10,6,7,'Guest','guest'),(14,10,8,9,'Project worker','techbot'),(15,10,10,11,'Carmina Worker','carmina-worker');
 
+
 CREATE TABLE `%dbprefix%gacl_aro_groups_id_seq` (
   `id` int(11) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 INSERT INTO `%dbprefix%gacl_aro_groups_id_seq` VALUES (15);
+
 
 CREATE TABLE `%dbprefix%gacl_aro_groups_map` (
   `acl_id` int(11) NOT NULL DEFAULT '0',
@@ -443,6 +492,7 @@ CREATE TABLE `%dbprefix%gacl_aro_groups_map` (
 
 INSERT INTO `%dbprefix%gacl_aro_groups_map` VALUES (10,10),(11,11),(12,11),(13,13),(14,12),(15,14),(16,13),(16,14),(32,10);
 
+
 CREATE TABLE `%dbprefix%gacl_aro_map` (
   `acl_id` int(11) NOT NULL DEFAULT '0',
   `section_value` varchar(80) NOT NULL,
@@ -451,6 +501,7 @@ CREATE TABLE `%dbprefix%gacl_aro_map` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 INSERT INTO `%dbprefix%gacl_aro_map` VALUES (33,'user','1');
+
 
 CREATE TABLE `%dbprefix%gacl_aro_sections` (
   `id` int(11) NOT NULL DEFAULT '0',
@@ -465,17 +516,20 @@ CREATE TABLE `%dbprefix%gacl_aro_sections` (
 
 INSERT INTO `%dbprefix%gacl_aro_sections` VALUES (10,'user',1,'Users',0);
 
+
 CREATE TABLE `%dbprefix%gacl_aro_sections_seq` (
   `id` int(11) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 INSERT INTO `%dbprefix%gacl_aro_sections_seq` VALUES (10);
 
+
 CREATE TABLE `%dbprefix%gacl_aro_seq` (
   `id` int(11) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-INSERT INTO `%dbprefix%gacl_aro_seq` VALUES (17);
+INSERT INTO `%dbprefix%gacl_aro_seq` VALUES (18);
+
 
 CREATE TABLE `%dbprefix%gacl_axo` (
   `id` int(11) NOT NULL DEFAULT '0',
@@ -490,6 +544,7 @@ CREATE TABLE `%dbprefix%gacl_axo` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 INSERT INTO `%dbprefix%gacl_axo` VALUES (10,'sys','acl',1,'ACL Administration',0),(11,'app','admin',1,'User Administration',0),(12,'app','calendar',2,'Calendar',0),(13,'app','events',2,'Events',0),(14,'app','companies',3,'Companies',0),(15,'app','contacts',4,'Contacts',0),(16,'app','departments',5,'Departments',0),(17,'app','files',6,'Files',0),(18,'app','file_folders',6,'File Folders',0),(19,'app','forums',7,'Forums',0),(20,'app','help',8,'Help',0),(21,'app','projects',9,'Projects',0),(22,'app','system',10,'System Administration',0),(23,'app','tasks',11,'Tasks',0),(24,'app','task_log',11,'Task Logs',0),(25,'app','helpdesk',12,'Helpdesk',0),(26,'app','public',13,'Public',0),(27,'app','roles',14,'Roles Administration',0),(28,'app','users',15,'User Table',0),(29,'app','history',1,'History',0),(30,'app','resources',1,'Resources',0),(31,'app','smartsearch',1,'SmartSearch',0),(32,'tasks','157',0,'Link Bot',0),(33,'projects','26',0,'Carmina',0),(34,'app','projectdesigner',1,'ProjectDesigner',0),(35,'projects','41',0,'Dotproject',0),(36,'app','carmina',1,'Carmina-Flex',0);
+
 
 CREATE TABLE `%dbprefix%gacl_axo_groups` (
   `id` int(11) NOT NULL DEFAULT '0',
@@ -506,11 +561,13 @@ CREATE TABLE `%dbprefix%gacl_axo_groups` (
 
 INSERT INTO `%dbprefix%gacl_axo_groups` VALUES (10,0,1,8,'Modules','mod'),(11,10,2,3,'All Modules','all'),(12,10,4,5,'Admin Modules','admin'),(13,10,6,7,'Non-Admin Modules','non_admin');
 
+
 CREATE TABLE `%dbprefix%gacl_axo_groups_id_seq` (
   `id` int(11) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 INSERT INTO `%dbprefix%gacl_axo_groups_id_seq` VALUES (13);
+
 
 CREATE TABLE `%dbprefix%gacl_axo_groups_map` (
   `acl_id` int(11) NOT NULL DEFAULT '0',
@@ -520,6 +577,7 @@ CREATE TABLE `%dbprefix%gacl_axo_groups_map` (
 
 INSERT INTO `%dbprefix%gacl_axo_groups_map` VALUES (11,11),(13,13),(14,13),(15,13);
 
+
 CREATE TABLE `%dbprefix%gacl_axo_map` (
   `acl_id` int(11) NOT NULL DEFAULT '0',
   `section_value` varchar(80) NOT NULL DEFAULT '0',
@@ -528,6 +586,7 @@ CREATE TABLE `%dbprefix%gacl_axo_map` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 INSERT INTO `%dbprefix%gacl_axo_map` VALUES (12,'sys','acl'),(16,'app','users'),(19,'app','projects'),(21,'tasks','157'),(33,'app','helpdesk');
+
 
 CREATE TABLE `%dbprefix%gacl_axo_sections` (
   `id` int(11) NOT NULL DEFAULT '0',
@@ -542,17 +601,20 @@ CREATE TABLE `%dbprefix%gacl_axo_sections` (
 
 INSERT INTO `%dbprefix%gacl_axo_sections` VALUES (10,'sys',1,'System',0),(11,'app',2,'Application',0),(12,'resources',0,'Resources Record',0),(13,'tasks',0,'Tasks Record',0),(14,'projects',0,'Projects Record',0),(16,'companies',0,'Companies Record',0);
 
+
 CREATE TABLE `%dbprefix%gacl_axo_sections_seq` (
   `id` int(11) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 INSERT INTO `%dbprefix%gacl_axo_sections_seq` VALUES (18);
 
+
 CREATE TABLE `%dbprefix%gacl_axo_seq` (
   `id` int(11) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 INSERT INTO `%dbprefix%gacl_axo_seq` VALUES (39);
+
 
 CREATE TABLE `%dbprefix%gacl_groups_aro_map` (
   `group_id` int(11) NOT NULL DEFAULT '0',
@@ -563,6 +625,7 @@ CREATE TABLE `%dbprefix%gacl_groups_aro_map` (
 
 INSERT INTO `%dbprefix%gacl_groups_aro_map` VALUES (11,10),(13,15);
 
+
 CREATE TABLE `%dbprefix%gacl_groups_axo_map` (
   `group_id` int(11) NOT NULL DEFAULT '0',
   `axo_id` int(11) NOT NULL DEFAULT '0',
@@ -572,6 +635,7 @@ CREATE TABLE `%dbprefix%gacl_groups_axo_map` (
 
 INSERT INTO `%dbprefix%gacl_groups_axo_map` VALUES (11,11),(12,11),(11,12),(13,12),(11,13),(13,13),(11,14),(13,14),(11,15),(13,15),(11,16),(13,16),(11,17),(13,17),(11,18),(13,18),(11,19),(13,19),(11,20),(13,20),(11,21),(13,21),(11,22),(12,22),(11,23),(13,23),(11,24),(13,24),(11,25),(13,25),(11,26),(13,26),(11,27),(12,27),(11,28),(12,28),(11,29),(13,29),(11,30),(13,30),(11,31),(13,31),(11,34),(13,34),(11,36),(13,36),(11,38),(13,38);
 
+
 CREATE TABLE `%dbprefix%gacl_phpgacl` (
   `name` varchar(230) NOT NULL,
   `value` varchar(230) NOT NULL,
@@ -579,6 +643,7 @@ CREATE TABLE `%dbprefix%gacl_phpgacl` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 INSERT INTO `%dbprefix%gacl_phpgacl` VALUES ('schema_version','2.1'),('version','3.3.2');
+
 
 CREATE TABLE `%dbprefix%helpdesk_item_status` (
   `status_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -591,11 +656,13 @@ CREATE TABLE `%dbprefix%helpdesk_item_status` (
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
 
+
 CREATE TABLE `%dbprefix%helpdesk_item_watchers` (
   `item_id` int(11) NOT NULL DEFAULT '0',
   `user_id` int(11) NOT NULL DEFAULT '0',
   `notify` char(1) NOT NULL DEFAULT ''
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 
 
 CREATE TABLE `%dbprefix%helpdesk_items` (
@@ -628,6 +695,7 @@ CREATE TABLE `%dbprefix%helpdesk_items` (
 ) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 
 
+
 CREATE TABLE `%dbprefix%history` (
   `history_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `history_date` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
@@ -645,6 +713,7 @@ CREATE TABLE `%dbprefix%history` (
 ) ENGINE=MyISAM AUTO_INCREMENT=101 DEFAULT CHARSET=latin1;
 
 
+
 CREATE TABLE `%dbprefix%login_header` (
   `login_header_id` int(11) NOT NULL AUTO_INCREMENT,
   `session_id` varchar(128) CHARACTER SET latin1 COLLATE latin1_general_ci NOT NULL,
@@ -654,6 +723,7 @@ CREATE TABLE `%dbprefix%login_header` (
   PRIMARY KEY (`login_header_id`),
   KEY `sessionid` (`session_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 
 
 CREATE TABLE `%dbprefix%modules` (
@@ -677,6 +747,7 @@ CREATE TABLE `%dbprefix%modules` (
 
 INSERT INTO `%dbprefix%modules` VALUES (1,'Companies','companies','1.0.0','','core',1,'Companies','handshake.png',1,1,'','companies','company_id','company_name'),(2,'Projects','projects','1.0.0','','core',1,'Projects','applet3-48.png',2,1,'','projects','project_id','project_name'),(3,'Tasks','tasks','1.0.0','','core',1,'Tasks','applet-48.png',3,1,'','tasks','task_id','task_name'),(4,'Calendar','calendar','1.0.0','','core',1,'Calendar','myevo-appointments.png',4,1,'','events','event_id','event_title'),(5,'Files','files','1.0.0','','core',1,'Files','folder5.png',5,1,'','files','file_id','file_name'),(6,'Contacts','contacts','1.0.0','','core',1,'Contacts','monkeychat-48.png',6,1,'','contacts','contact_id','contact_title'),(7,'Forums','forums','1.0.0','','core',1,'Forums','support.png',7,1,'','forums','forum_id','forum_name'),(9,'User Administration','admin','1.0.0','','core',1,'User Admin','helix-setup-users.png',9,1,'','users','user_id','user_username'),(10,'System Administration','system','1.0.0','','core',1,'System Admin','48_my_computer.png',10,1,'','','',''),(11,'Departments','departments','1.0.0','','core',1,'Departments','users.gif',11,1,'','departments','dept_id','dept_name'),(12,'Help','help','1.0.0','','core',1,'Help','dp.gif',12,1,'','','',''),(13,'Public','public','1.0.0','','core',1,'Public','users.gif',13,0,'','','',''),(14,'History','history','0.32','CSetupHistory','user',1,'History','',13,1,'A module for tracking changes',NULL,NULL,NULL),(15,'Resources','resources','1.0.1','SResource','user',1,'Resources','helpdesk.png',14,1,'','resources','resource_id','resource_name'),(16,'SmartSearch','smartsearch','2.0','SSearchNS','user',1,'SmartSearch','kfind.png',16,1,'A module to search keywords and find the needle in the haystack',NULL,NULL,NULL),(17,'ProjectDesigner','projectdesigner','1.0','projectDesigner','user',1,'ProjectDesigner','projectdesigner.jpg',17,1,'A module to design projects',NULL,NULL,NULL),(22,'HelpDesk','helpdesk','0.6','CSetupHelpDesk','user',1,'Help Desk','helpdesk.png',20,1,'Help Desk is a bug, feature request, complaint and suggestion tracking centre','companies','company_id','company_name');
 
+
 CREATE TABLE `%dbprefix%permissions` (
   `permission_id` int(11) NOT NULL AUTO_INCREMENT,
   `permission_user` int(11) NOT NULL DEFAULT '0',
@@ -690,6 +761,7 @@ CREATE TABLE `%dbprefix%permissions` (
 ) ENGINE=MyISAM AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
 
 INSERT INTO `%dbprefix%permissions` VALUES (1,1,'all',-1,-1);
+
 
 CREATE TABLE `%dbprefix%phpbrowscap` (
   `browser_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -737,16 +809,19 @@ CREATE TABLE `%dbprefix%phpbrowscap` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
+
 CREATE TABLE `%dbprefix%project_contacts` (
   `project_id` int(10) NOT NULL,
   `contact_id` int(10) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 
+
 CREATE TABLE `%dbprefix%project_departments` (
   `project_id` int(10) NOT NULL,
   `department_id` int(10) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 
 
 CREATE TABLE `%dbprefix%project_designer_options` (
@@ -761,6 +836,7 @@ CREATE TABLE `%dbprefix%project_designer_options` (
   PRIMARY KEY (`pd_option_id`),
   UNIQUE KEY `pd_option_user` (`pd_option_user`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 
 
 CREATE TABLE `%dbprefix%projects` (
@@ -796,6 +872,7 @@ CREATE TABLE `%dbprefix%projects` (
 ) ENGINE=MyISAM AUTO_INCREMENT=91 DEFAULT CHARSET=latin1;
 
 
+
 CREATE TABLE `%dbprefix%resource_tasks` (
   `resource_id` int(11) NOT NULL DEFAULT '0',
   `task_id` int(11) NOT NULL DEFAULT '0',
@@ -803,6 +880,7 @@ CREATE TABLE `%dbprefix%resource_tasks` (
   KEY `resource_id` (`resource_id`),
   KEY `task_id` (`task_id`,`resource_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 
 
 CREATE TABLE `%dbprefix%resource_types` (
@@ -813,6 +891,7 @@ CREATE TABLE `%dbprefix%resource_types` (
 ) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
 
 INSERT INTO `%dbprefix%resource_types` VALUES (1,'Equipment',NULL),(2,'Tool',NULL),(3,'Venue',NULL);
+
 
 CREATE TABLE `%dbprefix%resources` (
   `resource_id` int(11) NOT NULL AUTO_INCREMENT,
@@ -827,6 +906,7 @@ CREATE TABLE `%dbprefix%resources` (
 ) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
 
 
+
 CREATE TABLE `%dbprefix%roles` (
   `role_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `role_name` varchar(24) NOT NULL DEFAULT '',
@@ -835,6 +915,7 @@ CREATE TABLE `%dbprefix%roles` (
   `role_module` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`role_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 
 
 CREATE TABLE `%dbprefix%sessions` (
@@ -847,6 +928,7 @@ CREATE TABLE `%dbprefix%sessions` (
   KEY `session_updated` (`session_updated`),
   KEY `session_created` (`session_created`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 
 
 CREATE TABLE `%dbprefix%syskeys` (
@@ -863,6 +945,7 @@ CREATE TABLE `%dbprefix%syskeys` (
 
 INSERT INTO `%dbprefix%syskeys` VALUES (1,'SelectList','Enter values for list',0,'\n','|'),(2,'CustomField','Serialized array in the following format:\r\n<KEY>|<SERIALIZED ARRAY>\r\n\r\nSerialized Array:\r\n[type] => text | checkbox | select | textarea | label\r\n[name] => <Field name>\r\n[options] => <html capture options>\r\n[selects] => <options for select and checkbox>',0,'\n','|'),(3,'ColorSelection','Hex color values for type=>color association.',0,'\n','|'),(5,'HelpDeskList','Enter values for list',0,'\n','|');
 
+
 CREATE TABLE `%dbprefix%sysvals` (
   `sysval_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `sysval_key_id` int(10) unsigned NOT NULL DEFAULT '0',
@@ -872,12 +955,14 @@ CREATE TABLE `%dbprefix%sysvals` (
   UNIQUE KEY `idx_sysval_title` (`sysval_title`)
 ) ENGINE=MyISAM AUTO_INCREMENT=30 DEFAULT CHARSET=latin1;
 
-INSERT INTO `%dbprefix%sysvals` VALUES (1,1,'ProjectStatus','0|Not Defined\r\n1|Proposed\r\n2|In Planning\r\n3|In Progress\r\n4|On Hold\r\n5|Complete\r\n6|Template\r\n7|Archived'),(2,1,'CompanyType','0|Not Applicable\n1|Client\n2|Vendor\n3|Supplier\n4|Consultant\n5|Government\n6|Internal'),(3,1,'TaskDurationType','1|hours\n24|days'),(5,1,'TaskStatus','0|Active\n-1|Inactive'),(6,1,'TaskType','0|Unknown\n1|Administrative\n2|Operative'),(7,1,'ProjectType','0|Unknown\n1|Administrative\n2|Operative'),(8,3,'ProjectColors','Web|FFE0AE\nEngineering|AEFFB2\nHelpDesk|FFFCAE\nSystem Administration|FFAEAE'),(9,1,'FileType','0|Unknown\n1|Document\n2|Application'),(10,1,'TaskPriority','-1|low\n0|normal\n1|high'),(11,1,'ProjectPriority','-1|low\n0|normal\n1|high'),(12,1,'ProjectPriorityColor','-1|#E5F7FF\n0|\n1|#FFDCB3'),(13,1,'TaskLogReference','0|Not Defined\n1|Email\n2|Helpdesk\n3|Phone Call\n4|Fax'),(14,1,'TaskLogReferenceImage','0| 1|./images/obj/email.gif 2|./modules/helpdesk/images/helpdesk.png 3|./images/obj/phone.gif 4|./images/icons/stock_print-16.png'),(15,1,'UserType','0|Default User\r\n1|Administrator\r\n2|CEO\r\n3|Director\r\n4|Branch Manager\r\n5|Manager\r\n6|Supervisor\r\n7|Employee'),(16,1,'ProjectRequiredFields','f.project_name.value.length|<3\r\nf.project_color_identifier.value.length|<3\r\nf.project_company.options[f.project_company.selectedIndex].value|<1'),(19,1,'TicketStatus','0|Open\n1|Closed\n2|Deleted'),(21,4,'HelpDeskPriority','0|Not Specified\n1|Low\n2|Medium\n3|High'),(22,4,'HelpDeskSeverity','0|Not Specified\n1|No Impact\n2|Low\n3|Medium\n4|High\n5|Critical'),(23,4,'HelpDeskCallType','0|Not Specified\r\n1|Bug\r\n2|Feature Request\r\n3|Complaint\r\n4|Suggestion'),(24,4,'HelpDeskSource','0|Not Specified\n1|E-Mail\n2|Phone\n3|Fax\n4|In Person\n5|E-Lodged\n6|WWW'),(25,4,'HelpDeskOS','0|Not Applicable\n1|Linux\n2|Unix\n3|Solaris 8\n4|Solaris 9\n5|Red Hat 6\n6|Red Hat 7\n7|Red Hat 8\n8|Windows 95\n9|Window 98\n10|Windows 2000\n11|Window 2000 Server\n12|Windows XP'),(26,4,'HelpDeskApplic','0|Not Applicable\n1|Word\n2|Excel'),(27,4,'HelpDeskStatus','0|Unassigned\n1|Open\n2|Closed\n3|On Hold\n4|Testing'),(28,4,'HelpDeskAuditTrail','0|Created\n1|Title\n2|Requestor Name\n3|Requestor E-mail\n4|Requestor Phone\n5|Assigned To\n6|Notify by e-mail\n7|Company\n8|Project\n9|Call Type\n10|Call Source\n11|Status\n12|Priority\n13|Severity\n14|Operating System\n15|Application\n16|Summary\n17|Deleted');
+INSERT INTO `%dbprefix%sysvals` VALUES (1,1,'ProjectStatus','0|Not Defined\r\n1|Proposed\r\n2|In Planning\r\n3|In Progress\r\n4|On Hold\r\n5|Complete\r\n6|Template\r\n7|Archived'),(2,1,'CompanyType','0|Not Applicable\n1|Client\n2|Vendor\n3|Supplier\n4|Consultant\n5|Government\n6|Internal'),(3,1,'TaskDurationType','1|hours\n24|days'),(5,1,'TaskStatus','0|Active\n-1|Inactive'),(6,1,'TaskType','0|Unknown\n1|Administrative\n2|Operative'),(7,1,'ProjectType','0|Unknown\n1|Administrative\n2|Operative'),(8,3,'ProjectColors','Web|FFE0AE\nEngineering|AEFFB2\nHelpDesk|FFFCAE\nSystem Administration|FFAEAE'),(9,1,'FileType','0|Unknown\n1|Document\n2|Application'),(10,1,'TaskPriority','-1|low\n0|normal\n1|high'),(11,1,'ProjectPriority','-1|low\n0|normal\n1|high'),(12,1,'ProjectPriorityColor','-1|#E5F7FF\n0|\n1|#FFDCB3'),(13,1,'TaskLogReference','0|Not Defined\n1|Email\n2|Helpdesk\n3|Phone Call\n4|Fax'),(14,1,'TaskLogReferenceImage','0| 1|./images/obj/email.gif 2|./modules/helpdesk/images/helpdesk.png 3|./images/obj/phone.gif 4|./images/icons/stock_print-16.png'),(15,1,'UserType','0|Default User\r\n1|Administrator\r\n2|CEO\r\n3|Director\r\n4|Branch Manager\r\n5|Manager\r\n6|Supervisor\r\n7|Employee'),(16,1,'ProjectRequiredFields','f.project_name.value.length|<3\r\nf.project_color_identifier.value.length|<3\r\nf.project_company.options[f.project_company.selectedIndex].value|<1'),(19,1,'TicketStatus','0|Open\n1|Closed\n2|Deleted'),(21,5,'HelpDeskPriority','0|Not Specified\n1|Low\n2|Medium\n3|High'),(22,5,'HelpDeskSeverity','0|Not Specified\n1|No Impact\n2|Low\n3|Medium\n4|High\n5|Critical'),(23,5,'HelpDeskCallType','0|Not Specified\r\n1|Bug\r\n2|Feature Request\r\n3|Complaint\r\n4|Suggestion'),(24,5,'HelpDeskSource','0|Not Specified\n1|E-Mail\n2|Phone\n3|Fax\n4|In Person\n5|E-Lodged\n6|WWW'),(25,5,'HelpDeskOS','0|Not Applicable\n1|Linux\n2|Unix\n3|Solaris 8\n4|Solaris 9\n5|Red Hat 6\n6|Red Hat 7\n7|Red Hat 8\n8|Windows 95\n9|Window 98\n10|Windows 2000\n11|Window 2000 Server\n12|Windows XP'),(26,5,'HelpDeskApplic','0|Not Applicable\n1|Word\n2|Excel'),(27,5,'HelpDeskStatus','0|Unassigned\n1|Open\n2|Closed\n3|On Hold\n4|Testing'),(28,5,'HelpDeskAuditTrail','0|Created\n1|Title\n2|Requestor Name\n3|Requestor E-mail\n4|Requestor Phone\n5|Assigned To\n6|Notify by e-mail\n7|Company\n8|Project\n9|Call Type\n10|Call Source\n11|Status\n12|Priority\n13|Severity\n14|Operating System\n15|Application\n16|Summary\n17|Deleted');
+
 
 CREATE TABLE `%dbprefix%task_contacts` (
   `task_id` int(10) NOT NULL,
   `contact_id` int(10) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 
 
 CREATE TABLE `%dbprefix%task_departments` (
@@ -886,11 +971,13 @@ CREATE TABLE `%dbprefix%task_departments` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 
+
 CREATE TABLE `%dbprefix%task_dependencies` (
   `dependencies_task_id` int(11) NOT NULL,
   `dependencies_req_task_id` int(11) NOT NULL,
   PRIMARY KEY (`dependencies_task_id`,`dependencies_req_task_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 
 
 CREATE TABLE `%dbprefix%task_log` (
@@ -909,6 +996,7 @@ CREATE TABLE `%dbprefix%task_log` (
   PRIMARY KEY (`task_log_id`),
   KEY `idx_log_task` (`task_log_task`)
 ) ENGINE=MyISAM AUTO_INCREMENT=139 DEFAULT CHARSET=latin1;
+
 
 
 CREATE TABLE `%dbprefix%tasks` (
@@ -949,6 +1037,7 @@ CREATE TABLE `%dbprefix%tasks` (
 ) ENGINE=MyISAM AUTO_INCREMENT=332 DEFAULT CHARSET=latin1;
 
 
+
 CREATE TABLE `%dbprefix%user_access_log` (
   `user_access_log_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int(10) unsigned NOT NULL,
@@ -966,7 +1055,8 @@ CREATE TABLE `%dbprefix%user_access_log` (
   KEY `session_id` (`session_id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=24156 DEFAULT CHARSET=latin1;
 
-INSERT INTO `%dbprefix%user_access_log` VALUES (24155,1,'','127.0.0.1','',NULL,'2015-03-17 11:44:22','0000-00-00 00:00:00','2015-03-17 12:04:41',NULL,NULL,NULL);
+INSERT INTO `%dbprefix%user_access_log` VALUES (24155,1,'','127.0.0.1','',NULL,'2015-03-17 11:44:22','0000-00-00 00:00:00','2015-03-18 13:55:53',NULL,NULL,NULL);
+
 
 CREATE TABLE `%dbprefix%user_events` (
   `user_id` int(11) NOT NULL DEFAULT '0',
@@ -974,6 +1064,7 @@ CREATE TABLE `%dbprefix%user_events` (
   KEY `uek1` (`user_id`,`event_id`),
   KEY `uek2` (`event_id`,`user_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 
 
 CREATE TABLE `%dbprefix%user_preferences` (
@@ -984,10 +1075,12 @@ CREATE TABLE `%dbprefix%user_preferences` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 
+
 CREATE TABLE `%dbprefix%user_roles` (
   `user_id` int(10) unsigned NOT NULL DEFAULT '0',
   `role_id` int(10) unsigned NOT NULL DEFAULT '0'
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 
 
 CREATE TABLE `%dbprefix%user_task_pin` (
@@ -996,6 +1089,7 @@ CREATE TABLE `%dbprefix%user_task_pin` (
   `task_pinned` tinyint(2) NOT NULL DEFAULT '1',
   PRIMARY KEY (`user_id`,`task_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 
 
 CREATE TABLE `%dbprefix%user_tasks` (
@@ -1007,6 +1101,7 @@ CREATE TABLE `%dbprefix%user_tasks` (
   PRIMARY KEY (`user_id`,`task_id`),
   KEY `user_type` (`user_type`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 
 
 CREATE TABLE `%dbprefix%users` (
@@ -1024,9 +1119,10 @@ CREATE TABLE `%dbprefix%users` (
   KEY `idx_uid` (`user_username`),
   KEY `idx_pwd` (`user_password`),
   KEY `idx_user_parent` (`user_parent`)
-) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
 
-INSERT INTO `%dbprefix%users` VALUES (1,1,'admin','dd0bdb8014dae5e32258312f1b550ae2',0,1,0,0,0,'Jean Lelarge\r\nDatabase Administrator\r\nwww.ppkl.net'),(6,6,'guess','084e0343a0486ff05530df6c705c8bb4',0,0,0,0,0,'guest');
+INSERT INTO `%dbprefix%users` VALUES (1,61,'admin','76a2173be6393254e72ffa4d6df1030a',0,1,0,0,0,'Jean Lelarge\r\nDatabase Administrator\r\nwww.ppkl.net'),(6,62,'guess','084e0343a0486ff05530df6c705c8bb4',0,0,0,0,0,'guest');
+
 
 CREATE TABLE `tasks_critical` (
   `task_project` varchar(10) DEFAULT NULL,
@@ -1035,10 +1131,12 @@ CREATE TABLE `tasks_critical` (
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 
+
 CREATE TABLE `tasks_problems` (
   `task_project` varchar(10) DEFAULT NULL,
   `task_log_problem` tinyint(1) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 
 
 CREATE TABLE `tasks_sum` (
@@ -1046,6 +1144,7 @@ CREATE TABLE `tasks_sum` (
   `total_tasks` int(6) DEFAULT NULL,
   `project_percent_complete` varchar(11) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
 
 
 CREATE TABLE `tasks_summy` (

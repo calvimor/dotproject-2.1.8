@@ -34,7 +34,7 @@ $sql = $q->prepare();
 $q->clear();
 
 $obj = null;
-if (!db_loadObject($sql, $obj) && $company_id > 0) {
+if ( $company_id > 0 && !db_loadObject($sql, $obj) ) {
 	//$AppUI->setMsg('$qid =& $q->exec(); Company'); // What is this for?
 	$AppUI->setMsg('invalidID', UI_MSG_ERROR, true);
 	$AppUI->redirect();
@@ -48,6 +48,7 @@ $q->addQuery('user_id');
 $q->addQuery('CONCAT_WS(", ",contact_last_name,contact_first_name)'); 
 $q->addOrder('contact_last_name');
 $q->addWhere('u.user_contact = con.contact_id');
+echo $q->prepare();
 $owners = $q->loadHashList();
 
 // setup the title block

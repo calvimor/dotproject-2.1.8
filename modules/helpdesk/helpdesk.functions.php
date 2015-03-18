@@ -72,9 +72,17 @@ function getAllowedProjects($list = 0){
 	//echo "!".implode(" AND ",$rowproject>getAllowedSQL( $AppUI->user_id))."!";
 	  return $allowedProjects;
   } else {
-  //otherwise, get a list of all projects associated with the user's permitted companies.
-  //the use case here would be that the person assigning or updating the Helpdesk item may not have access to all Projects.  They might just be traffic control.  This will minimise perm maintenance.
-  	$sql = "SELECT project_id, project_name FROM " . $dbPrefix . "projects WHERE project_company in (". implode(",",array_keys(getAllowedCompanies())).") ORDER BY project_name";
+	  
+	  $allCie = getAllowedCompanies();
+	  
+	  if ( count( $allCie ) ){
+		//otherwise, get a list of all projects associated with the user's permitted companies.
+		//the use case here would be that the person assigning or updating the Helpdesk item may not have access to all Projects.  They might just be traffic control.  This will minimise perm maintenance.
+		$sql = "SELECT project_id, project_name FROM " . $dbPrefix . "projects WHERE project_company in (". implode(",",array_keys($allCie)).") ORDER BY project_name";
+	  } else{
+		$sql = "SELECT project_id, project_name FROM " . $dbPrefix . "projects ORDER BY project_name";
+	  }
+	  	   	
   	if ($list) {
   		return db_loadHashList( $sql );
   	} else {

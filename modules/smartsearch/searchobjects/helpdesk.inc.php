@@ -1,4 +1,4 @@
-<?php /* SMARTSEARCH$Id: helpdesk.inc.php 6038 2010-10-03 05:49:01Z j.lelarge $ */
+<?php /* SMARTSEARCH$Id: helpdesk.inc.php 6038 2010-10-03 05:49:01Z  $ */
 if (!defined('DP_BASE_DIR')) {
   die('You should not access this file directly.');
 }
@@ -10,7 +10,7 @@ class helpdesk extends smartsearch
 {
 	var $table = 'helpdesk_items';
 	var $table_module = 'helpdesk';
-	var $table_key = 'helpdesk';
+	var $table_key = 'item_id';
 	var $table_link = '?m=helpdesk&amp;a=view&amp;ticket=';
 	var $table_title = 'Helpdesk';
 	var $table_orderby = 'subject';
@@ -19,6 +19,10 @@ class helpdesk extends smartsearch
 	                            'signature');
 
 	function ctickets () {
+
+		$dbPrefix = dPgetConfig('dbprefix');
+		$this->table = $dbPrefix . $this->table;
+
 		return new tickets();
 	}
 }

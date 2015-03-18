@@ -19,7 +19,7 @@ $AppUI->setMsg('Company');
 if ($del) {
 	if (!$obj->canDelete($msg)) {
 		$AppUI->setMsg($msg, UI_MSG_ERROR);
-		$AppUI->redirect();
+	//	$AppUI->redirect();
 	}
 	
 	if (($msg = $obj->delete())) {
