@@ -117,7 +117,7 @@ CREATE TABLE `%dbprefix%contacts` (
   KEY `idx_prp` (`contact_project`)
 ) ENGINE=MyISAM AUTO_INCREMENT=64 DEFAULT CHARSET=latin1;
 
-INSERT INTO `%dbprefix%contacts` VALUES (61,'Admin','Administrator','',NULL,NULL,NULL,'0',NULL,NULL,'admin@gmail.com',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,'obj/contact',0,0),(62,'guest','guest','',NULL,NULL,NULL,'0',NULL,NULL,'guest@gmail.com',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,'obj/contact',0,0),(63,'testlouis','louistest','',NULL,NULL,NULL,'0',NULL,NULL,'louis@gmail.com',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,'obj/contact',1,0);
+INSERT INTO `%dbprefix%contacts` VALUES (61,'Admin','Administrator','',NULL,NULL,NULL,'0',NULL,NULL,'admin@gmail.com',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,'obj/contact',0,0),(62,'guest','guest','',NULL,NULL,NULL,'0',NULL,NULL,'guest@gmail.com',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,'obj/contact',0,0);
 
 
 CREATE TABLE `%dbprefix%custom_fields_lists` (

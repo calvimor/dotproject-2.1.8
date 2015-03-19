@@ -62,7 +62,7 @@ else
           <tr>
             <td class="title" colspan="2">&nbsp;</td>
         </tr>
-          <tr>
+         <!-- <tr>
             <td class="title" colspan="2">Download existing Data (Recommended)</td>
         </tr>
         <tr>
@@ -73,7 +73,7 @@ else
         <tr>
             <td class="item">Receive XML Backup Schema File</td>
             <td align="left"><input class="button" type="submit" name="dobackup" value="Download XML" title="Click here to retrieve a XML file containing your data that can be stored on your local system." /></td>
-        </tr>
+        </tr>-->
           <tr>
             <td align="left"><br /><input class="button" type="submit" name="do_db" value="<?php echo $_POST['mode']; ?> db only" title="Try to set up the database with the given information." />
 	    &nbsp;<input class="button" type="submit" name="do_cfg" value="write config file only" title="Write a config file with the details only." /></td>
