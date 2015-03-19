@@ -59,7 +59,7 @@ if($HELPDESK_CONFIG['search_criteria_search']){
 	}
   
   $search =$AppUI->getState( 'HelpDeskSearch' ) !== null ? $AppUI->getState( 'HelpDeskSearch' ) : '';
-  echo "<br>".$search."<br>";
+//  echo "<br>".$search."<br>";
   if(strlen(trim($search))>0){
         $tarr[] = "(lower(hi.item_title) LIKE lower('%$search%')
                     OR lower(hi.item_summary) LIKE lower('%$search%'))";
