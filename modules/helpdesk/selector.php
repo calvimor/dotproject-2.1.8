@@ -121,11 +121,11 @@ if (!$ok) {
 		echo "<br />ok = $ok \n";
 	}
 } else {
-	if(!isset($list)){
+	
+	if(!isset($list) and is_array( $list ) and count( $list ) ){
 		$sql = "SELECT $select FROM $table";
 		$sql .= $where ? " WHERE $where" : '';
 		$sql .= $order ? " ORDER BY $order" : '';
-
 		$list = arrayMerge( array( 0=>''), db_loadHashList( $sql ) );
 	}
 	echo db_error();
@@ -145,7 +145,7 @@ if (!$ok) {
 <tr>
 	<td>
 <?php
-	if (count( $list ) > 1) {
+	if (count( $list ) >= 1) {
 		echo $AppUI->_( 'Select' ).' '.$AppUI->_( $title ).':<br />';
 		foreach ($list as $key => $val) {
 			echo "<a href=\"javascript:setClose('$key','".addslashes($val)."');\">$val</a><br>\n";
@@ -158,7 +158,7 @@ if (!$ok) {
 		<input type="button" class="button" value="<?php echo $AppUI->_( 'cancel' );?>" onclick="window.close()" />
 <?php
 	} else {
-		echo $AppUI->_( "no$table" );
+		echo $AppUI->_( "no $table" );
 	}
 ?>
 	</td>

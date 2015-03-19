@@ -9,6 +9,7 @@ $dbPrefix = dPgetConfig( 'dbprefix' );
 $allowedCompanies = arrayMerge( array( 0 => '' ), getAllowedCompanies() );
 
 $projects = getAllowedProjectsForJavascript(1);
+$dbPrefix = dPgetConfig('dbprefix');
 
 // Lets check cost codes
 /*$q = new DBQuery;
@@ -269,9 +270,8 @@ function updateStatus(obj){
 	$isMoz = strpos( $ua, 'Gecko' ) !== false;
 
 	print "\nvar projects = new Array(";
-	if(count($projects)>0){
-		print implode(",",$projects );
-			
+	if(isset($projects) and is_array( $projects ) and count($projects)>0){
+		print implode(",",$projects );			
 	}
 	else{
 	}

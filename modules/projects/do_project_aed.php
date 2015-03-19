@@ -3,7 +3,7 @@ if (!defined('DP_BASE_DIR')) {
   die('You should not access this file directly.');
 }
 
-//$AppUI->setState( 'SAVEDPLACE', $_SERVER['QUERY_STRING'] );
+$AppUI->setState( 'SAVEDPLACE', $_SERVER['QUERY_STRING'] );
 
 $obj = new CProject();
 $msg = '';
@@ -42,12 +42,11 @@ if ($del) {
 	$canDelete = $obj->canDelete($msg, $project_id);
 	if (!$canDelete) {
 		$AppUI->setMsg($msg, UI_MSG_ERROR);
-		$AppUI->redirect();
 	}
 	if (($msg = $obj->delete())) {
 		$AppUI->setMsg($msg, UI_MSG_ERROR);
-		$AppUI->redirect();
 	} else {
+		/* Redirection is advised here */
 		$AppUI->setMsg("Project deleted", UI_MSG_ALERT);
 		$AppUI->redirect("m=projects");
 	}
@@ -68,8 +67,8 @@ else {
  		$custom_fields->bind($_POST);
  		$sql = $custom_fields->store($obj->project_id); // Store Custom Fields
 
-
 	}
-	$AppUI->redirect();
+
+	$project_id = $obj->project_id;
 }
 ?>

@@ -13,6 +13,7 @@ function getAllowedUsers($companyid=0,$activeOnly=0){
 			WHERE (". getCompanyPerms("user_company", PERM_EDIT, $HELPDESK_CONFIG['the_company'])
 			." OR ". getCompanyPerms("contact_company", PERM_EDIT, $HELPDESK_CONFIG['the_company'])
 		 . ")";
+		 
 	if($companyid!=0 && $companyid!=$HELPDESK_CONFIG['the_company']){
 		//KZHAO   8-16-2006
                 $sql=$sql."AND (contact_company=$companyid or contact_company=".
@@ -23,6 +24,7 @@ function getAllowedUsers($companyid=0,$activeOnly=0){
 	$sql=$sql." ORDER BY contact_last_name, contact_first_name";
 
 	$users = db_loadHashList( $sql );
+
 	//Filter inactive users
 	if($activeOnly){
 		$perms =& $AppUI->acl();
@@ -48,7 +50,7 @@ function getAllowedCompanies($companyId=0){
   $company = new CCompany();
 
   $allowedCompanies = $company->getAllowedRecords( $AppUI->user_id, 'company_id,company_name', 'company_name' );
-  
+
   if($companyId!=0 && $companyId!=$HELPDESK_CONFIG['the_company']){
 	$compIds=array_keys($allowedCompanies);
 	foreach ($compIds as $row) {

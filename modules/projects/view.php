@@ -5,7 +5,9 @@ if (!defined('DP_BASE_DIR')) {
 
 GLOBAL $project_id;
 
-$project_id = intval(dPgetParam($_GET, 'project_id', 0));
+if ( ! isset( $project_id ) )
+	$project_id = intval(dPgetParam($_GET, 'project_id', 0));
+	
 $q = new DBQuery;
 
 //check permissions for this record

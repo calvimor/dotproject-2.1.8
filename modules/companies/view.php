@@ -3,12 +3,13 @@ if (!defined('DP_BASE_DIR')) {
 	die('You should not access this file directly.');
 }
 
-$company_id = intval(dPgetParam($_GET, 'company_id', 0));
+/* $company_id may now get set following the dosql */
+if ( ! isset( $company_id ) )
+	$company_id = intval(dPgetParam($_GET, 'company_id', 0));
 
 // check permissions for this record
 $canRead = getPermission($m, 'view', $company_id);
 $canEdit = getPermission($m, 'edit', $company_id);
-
 
 if (!$canRead) {
 	$AppUI->redirect('m=public&a=access_denied');
@@ -39,6 +40,7 @@ $q->clear();
 
 $obj = null;
 if (!db_loadObject($sql, $obj)) {
+	
 	$AppUI->setMsg('Company');
 	$AppUI->setMsg('invalidID', UI_MSG_ERROR, true);
 	$AppUI->redirect();
