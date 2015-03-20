@@ -234,7 +234,7 @@ echo $obj->file_description; ?></textarea>
 			</td>
 		<tr>
 			<td align="right" nowrap="nowrap"><?php echo $AppUI->_('Upload File'); ?>:</td>
-			<td align="left"><input type="File" class="button" name="formfile" style="width:270px" /></td>
+			<td align="left"><input type="File" class="button" name="formfile" style="width:270px" />&nbsp&nbsp( <?php echo $AppUI->_('Php Upload Max Filesize') . ": " . ini_get( 'upload_max_filesize' ); ?>&nbsp;If using fcgid - set MaxRequestLen accordingly )</td>
 		</tr>
 		<?php 
 if (!($file_id) || $ci || ($canAdmin && $obj->file_checkout == 'final')) { ?>

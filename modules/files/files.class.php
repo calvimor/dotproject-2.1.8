@@ -705,7 +705,10 @@ function getNextVersionID() {
 	$q->addQuery('MAX(f.file_version_id) AS max_version_id');
 	$latest_file_version = intval($q->loadResult());
 	$q->clear();
-	
+
+	if ( is_null( $latest_file_version ) )
+		$latest_file_version = 0;
+		
 	return ($latest_file_version + 1);
 }
 

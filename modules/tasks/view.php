@@ -173,6 +173,8 @@ function delIt() {
 <table border="0" cellpadding="4" cellspacing="0" width="100%" class="std">
 
 <form name="frmDelete" action="./index.php?m=tasks" method="post">
+	<input name="m" type="hidden" value="tasks" />
+	<input name="a" type="hidden" value="list" />
 	<input type="hidden" name="dosql" value="do_task_aed">
 	<input type="hidden" name="del" value="1" />
 	<input type="hidden" name="task_id" value="<?php echo $task_id;?>" />
