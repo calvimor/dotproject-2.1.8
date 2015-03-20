@@ -277,6 +277,7 @@ CREATE TABLE `%dbprefix%files` (
   `file_checkout` varchar(255) NOT NULL DEFAULT '',
   `file_co_reason` text,
   `file_version_id` int(11) NOT NULL DEFAULT '0',
+  `file_helpdesk_item` int(11) not null default '0',
   PRIMARY KEY (`file_id`),
   KEY `idx_file_task` (`file_task`),
   KEY `idx_file_project` (`file_project`),
