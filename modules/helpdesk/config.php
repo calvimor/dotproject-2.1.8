@@ -2,7 +2,7 @@
 $HELPDESK_CONFIG['items_per_page'] = '30';
 $HELPDESK_CONFIG['status_log_items_per_page'] = '10';
 $HELPDESK_CONFIG['pages_per_side'] = '5';
-$HELPDESK_CONFIG['the_company'] = '1';
+$HELPDESK_CONFIG['the_company'] = '7';
 $HELPDESK_CONFIG['no_company_editable'] = '0';
 $HELPDESK_CONFIG['minimum_edit_level'] = '1';
 $HELPDESK_CONFIG['use_project_perms'] = '0';
