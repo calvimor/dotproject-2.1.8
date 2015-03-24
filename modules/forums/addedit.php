@@ -39,12 +39,17 @@ $projObj = new CProject();
 //Pull project Information
 $q = new DBQuery;
 $q->addTable('projects');
-$q->addQuery('project_id, project_name');
+$q->addJoin('companies', 'c', 'c.company_id = project_company');
+$q->addQuery('project_id, concat_ws(" | ", c.company_name, project_name) as project_name, project_company');
+
 $q->addWhere('project_status <> 7');
-$q->addOrder('project_name');
+
+$q->addOrder('c.company_name,project_name');
 $projObj->setAllowedSQL($AppUI->user_id, $q);
-if (isset($company_id))
-   $q->addWhere("project_company = $company_id");
+//if (isset($company_id))
+  // $q->addWhere("project_company = $company_id");
+   //echo $q->prepare();
+   //die();
 $projects = array('0' => '') + $q->loadHashList();
 echo db_error();
 
