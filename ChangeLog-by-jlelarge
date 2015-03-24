@@ -1,19 +1,24 @@
 
 Update 2.1.8 mid-march 2015
 
-	-	Disabled upgrade_permissions.php on new installation - phpgacl is misbehaving
+	-	Disabled upgrade_permissions.php on new installation - phpgacl is reporting problems
 		further testing required
 	-	Removed TicketSmith code and database tables
-	-	Installed the Helpdesk from linuxbox.com
+	-	Installed the Helpdesk from linuxbox.com - revision of modules/helpdesk/config.php is mandatory:
+			set 'the_company' to your company Id - click on the company top menu item and hoover the mouse over the link of your company
+			the Url will show at the bottom of the screen. Take note of the 'company_id' value and set it in your config.php file
+			
 	-	Code reviewed and corrected the Helpdesk 
 	
 			- Added prefix support to all DB Queries
-			- the gateway has not been tested ( utility to automatically create ticket item via emails )
-			- the smartsearch module in incomplete
+			- the gateway has not been tested ( utility to automatically create tickets item via emails )
 			
 	-	Updated the dotproject.sql base file
         -	Fixed generic routing bug when posting - no more redirection to Day View after posting in major modules 
 	-	Integration of CkEditor javascript library to edit textareas mainly - install CkEditor as ckeditor in dotproject/js
+	
+	-	Important note: This version of Dotproject is extensively used with the Grey Slimline Style - Others are giving problems 
+						with javascript code rendering the software not so useful. Such is the case with Tasks' dates.
 	  
 Version 2.1.8 mid-november 2014
 
