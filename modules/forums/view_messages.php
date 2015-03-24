@@ -17,7 +17,6 @@ $q->addJoin('users', 'u', 'message_author = u.user_id');
 $q->addJoin('contacts', 'con', 'contact_id = user_contact');
 $q->addWhere("forum_id = message_forum AND (message_id = $message_id OR message_parent = $message_id)");
 $q->addOrder("message_date $sort"); 
-
 $messages = $q->loadList();
 
 $crumbs = array();
@@ -69,7 +68,6 @@ function delIt(id) {
 </script>
 <?php
 $thispage = "?m=$m&amp;a=viewer&amp;forum_id=$forum_id&amp;message_id=$message_id&amp;sort=$sort";
-// $thispage = $_PHP['self'];
 ?>
 
 <table width="98%" cellspacing="1" cellpadding="2" border="0" align="center">
@@ -119,7 +117,7 @@ echo '<th width="' . (($viewtype=='single')?'60':'100') . '%">' .  $AppUI->_('Me
 <?php 
 $x = false;
 
-$date = new CDate();
+//$date = new CDate();
 
 if ($viewtype == 'single') {
 	$s = '';
@@ -129,10 +127,6 @@ if ($viewtype == 'single') {
 $new_messages = array();
 
 foreach ($messages as $row) {
-	// Find the parent message - the topic.
-	if ($row['message_id'] == $message_id) {
-		$topic = $row['message_title'];
-	}
 	
 	$q = new DBQuery;
 	$q->addTable('forum_messages', 'fm');
@@ -140,17 +134,47 @@ foreach ($messages as $row) {
 	$q->addQuery('DISTINCT contact_email, contact_first_name, contact_last_name, user_username');
 	$q->addJoin('contacts', 'con', 'contact_id = user_contact');
 	$q->addWhere('u.user_id = ' . $row['message_editor']);
+	
 	$editor = $q->loadList();
 	
 	$date = intval($row['message_date']) ? new CDate($row['message_date']) : null;
+	
+	// Find the parent message - the topic.
+	if ($row['message_id'] == $message_id) {
+		$topic = $row['message_title'];
+		$sub_message = array();
+	} else{
+		// List the replies
+		$q = new DBQuery;
+		$q->addTable('forums', 'f');
+		$q->addTable('forum_messages', 'fm');
+		$q->addQuery('fm.*,	contact_first_name, contact_last_name, contact_email, user_username, forum_moderated, visit_user');
+		$q->addJoin('forum_visits', 'v', "visit_user = {$AppUI->user_id} AND visit_forum = $forum_id AND visit_message = fm.message_id");
+		$q->addJoin('users', 'u', 'message_author = u.user_id');
+		$q->addJoin('contacts', 'con', 'contact_id = user_contact');
+		$q->addWhere("forum_id = message_forum AND ( message_parent = {$row['message_id']} )");
+		$q->addWhere('message_parent <> -1 ' );
+		$q->addWhere('message_forum <> ' . $row['message_id'] );
+		$q->addWhere('message_forum <> ' . $message_id );
+		$q->addOrder("message_date $sort"); 
+
+		$sub_message = $q->loadList();
+	}
+
 	if ($viewtype != 'single') {
 		$s = '';
 	}
+	
 	$style = $x ? 'background-color:#eeeeee' : '';
 	
 	//!!! Different table building for the three different views
 	// To be cleaned up, and reuse common code at later stage.
+	
+	/* Fetch the replies */
+	//SELECT fm.*, user_username, forum_moderated, visit_user FROM (`dotp_forums` as f,`dotp_forum_messages` as fm) LEFT JOIN `dotp_forum_visits` AS v ON visit_user = 1 AND visit_forum = 19 AND visit_message = fm.message_id LEFT JOIN `dotp_users` AS u ON message_author = u.user_id LEFT JOIN `dotp_contacts` AS con ON contact_id = user_contact WHERE forum_id = message_forum AND (message_id = 108 OR message_parent = 108) ORDER BY message_date asc
+	
 	if ($viewtype =='normal') {
+		
 		$s .= "<tr>";
 		
 		$s .= '<td valign="top" style="' . $style . '" nowrap="nowrap">';
@@ -178,19 +202,23 @@ foreach ($messages as $row) {
 			$new_messages[] = $row['message_id'];
 		}
 		$s .= '</td>';
+		
+		
+		
 		$s .= '<td valign="top" style="' . $style . '">';
-		$s .= '<font size="2"><strong>' . $row['message_title'] . '</strong><hr size=1>';
-		//$s .= nl2br($AppUI->___($row['message_body']));
-		//$s .= ($AppUI->___($row['message_body']));
+		
+		$s .= '<table width="100%" border=0><tr><td>';
+		$s .= '<font size="2"><strong>' . $row['message_title'] . '</strong>';
+		
+		$s .= '<hr size=1>';
 		$s .= $row['message_body'];
 		$s .= '</font></td>';
 		
-		$s .= '</tr><tr>';
+		//$s .= '<td valign="top" style="' . $style . '" nowrap="nowrap">';
+		//$s .= ('<img src="./images/icons/posticon.gif" alt="date posted" border="0" width="14" height="11" />'
+		  //     .$date->format("$df $tf") . '</td>');
 		
-		$s .= '<td valign="top" style="' . $style . '" nowrap="nowrap">';
-		$s .= ('<img src="./images/icons/posticon.gif" alt="date posted" border="0" width="14" height="11" />'
-		       .$date->format("$df $tf") . '</td>');
-		$s .= '<td valign="top" align="right" style="' . $style . '">';
+		$s .= '<td valign="center" align="right" style="' . $style . '">';
 		
 		//the following users are allowed to edit/delete a forum message: 
 		//1. the forum creator  2. a superuser with read-write access to 'all' 3. the message author
@@ -211,8 +239,54 @@ foreach ($messages as $row) {
 			$s .= '</a>';
 			$s .= '</td></tr></table>';
 		}
+		$s .= '</td></tr></table>';
 		$s .= '</td>';
 		$s .= '</tr>';
+		
+		if ( count( $sub_message ) ){
+			
+			foreach( $sub_message as $sub_mval ){
+				
+				$sub_date = intval($sub_mval['message_date']) ? new CDate($sub_mval['message_date']) : null;
+				$s .= '<tr><td align=right>' . $AppUI->___('Reply') . '<br><small><i>' . $sub_date->format("$df $tf") . '</i></small></td>';
+				
+				$s .= '<td valign="top" align="left">';
+				
+				$s .= '<table width="100%" ><tr><td style="background-color:white;">';
+				$s .= $sub_mval['message_body'];
+				$s .= '</td>';
+				
+				$s .= '<td align="right" style="background-color:white;">';
+
+				//the following users are allowed to edit/delete a forum message: 
+				//1. the forum creator  2. a superuser with read-write access to 'all' 3. the message author
+				$canEditSub = getPermission('forums', 'edit', $sub_mval['message_id']);
+				if ($canEditSub && ($AppUI->user_id == $sub_mval['forum_moderated'] 
+		                 || $AppUI->user_id == $sub_mval['message_author'] 
+		                 || getPermission('admin', 'edit'))) {
+					
+					$s .= '<table cellspacing="0" cellpadding="0" border="0"><tr>';
+					// edit message
+					$s .= ('<td><a href="?m=forums&amp;a=viewer&amp;post_message=1&amp;forum_id=' . $sub_mval['message_forum'] 
+			       . '&amp;message_parent=' . $sub_mval['message_parent'] . '&amp;message_id=' . $sub_mval['message_id'] . '" title="' 
+			       . $AppUI->_('Edit') . ' ' . $AppUI->_('Message') . '">');
+					$s .= dPshowImage('./images/icons/stock_edit-16.png', '16', '16');
+					$s .= '</td><td>';
+					// delete message
+					$s .= '<a href="javascript:delIt(' . $sub_mval['message_id'] . ')" title="' . $AppUI->_('delete') . '">';
+					$s .= dPshowImage('./images/icons/stock_delete-16.png', '16', '16');
+					$s .= '</a>';
+					$s .= '</td></tr></table>';
+					
+				}
+				
+				$s .= '</td>';
+				$s .= '</tr></table>';
+				
+				$s .= '</td></tr>';
+			}	
+		}
+					
 	} else if ($viewtype == 'short') {
 		$s .= "<tr>";
 		

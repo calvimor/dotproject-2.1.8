@@ -3,7 +3,7 @@ if (!defined('DP_BASE_DIR')) {
   die('You should not access this file directly.');
 }
 
-// Add / Edit forum
+// Add / Edit forum message
 $message_id = isset($_GET['message_id']) ? $_GET['message_id'] : 0;
 $message_parent = isset($_GET['message_parent']) ? $_GET['message_parent'] : -1;
 $forum_id = (int)dPgetParam($_REQUEST, 'forum_id', 0);
@@ -79,20 +79,22 @@ if ($canEdit) {
 ?>
 function submitIt() {
 	
-    var form = document.changeforum;
-    if (form.message_title.value.search(/^\s*$/) >= 0) {
-        alert("<?php echo $AppUI->_('forumSubject', UI_OUTPUT_JS);?>");
-        form.message_title.focus();
-    } 
-    //else if (form.message_body.value.search(/^\s*$/) >= 0) {
+	var thisform = document.changeforum;
 
-// The use of ckeditor is breaking this verification - the case is noted and deactivating the verification allows the saving of new records
-//alert(form.message_body.value);
-    //    alert("<?php echo $AppUI->_('forumTypeMessage', UI_OUTPUT_JS);?>");
-  //      form.message_body.focus();
-    //} else {
-        form.submit();
-   // }
+    var titleId = document.getElementById('forum_title');
+    var bodyId  = document.getElementById('forum_body');
+    
+    if (titleId.value.search(/^\s*$/) >= 0) {
+        alert("<?php echo $AppUI->_('forumSubject', UI_OUTPUT_JS);?>");
+        titleId.focus();
+    } else {
+        thisform.submit();
+    }
+
+//    else if (bodyId.value.search(/^\s*$/) >= 0) {
+		// The use of ckeditor is breaking this verification - the case is noted and deactivating the verification allows the saving of new records
+  //      alert("<?php echo $AppUI->_('forumTypeMessage', UI_OUTPUT_JS);?>");
+    //    document.changeforum.message_body.focus();
 }
 
 function delIt() {
@@ -160,13 +162,13 @@ echo dPformSafe($message_info['message_body']);
 <tr>
     <td align="right"><?php echo $AppUI->_('Subject');?>:</td>
     <td>
-        <input type="text" name="message_title" value="<?php echo ($message_id || $message_parent < 0 ? '' : 'Re: ') .$AppUI->___($message_info['message_title']);?>" size=50 maxlength=250 />
+        <input id="forum_title" type="text" name="message_title" value="<?php echo ($message_id || $message_parent < 0 ? '' : 'Re: ') .$AppUI->___($message_info['message_title']);?>" size=50 maxlength=250 />
     </td>
 </tr>
 <tr>
     <td align="right" valign="top"><?php echo $AppUI->_('Message');?>:</td>
     <td align="left" valign="top">
-       <textarea cols="60" name="message_body" style="height:200px">
+       <textarea id="forum_body" cols="60" name="message_body" style="height:200px">
        <?php
        /*
             if ( message_id == 0 and ( $message_parent != -1 ) ){
