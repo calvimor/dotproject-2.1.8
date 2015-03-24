@@ -47,26 +47,26 @@ if(!$canEdit){
   $AppUI->redirect( "m=public&a=access_denied" );
 }
 // Use new default 'assigned to' ---KZHAO
-if(!@$hditem["item_assigned_to"]){
+if(!$hditem["item_assigned_to"]){
   if($HELPDESK_CONFIG['default_assigned_to_current_user']=='-1'){
-      @$hditem["item_assigned_to"] = 0;
-      if(!@$hditem["item_status"])
-          @$hditem["item_status"]=0;
+      $hditem["item_assigned_to"] = 0;
+      if(!$hditem["item_status"])
+          $hditem["item_status"]=0;
   }
   elseif($HELPDESK_CONFIG['default_assigned_to_current_user']=='0'){
-      @$hditem["item_assigned_to"] = $AppUI->user_id;
-      if(!@$hditem["item_status"])
-                @$hditem["item_status"]=1;
+      $hditem["item_assigned_to"] = $AppUI->user_id;
+      if(!$hditem["item_status"])
+                $hditem["item_status"]=1;
   }
   else{
-      @$hditem["item_assigned_to"] = $HELPDESK_CONFIG['default_assigned_to_current_user'];
-      if(!@$hditem["item_status"])
-                @$hditem["item_status"]=1;
+      $hditem["item_assigned_to"] = $HELPDESK_CONFIG['default_assigned_to_current_user'];
+      if(!$hditem["item_status"])
+                $hditem["item_status"]=1;
   }
 }
 
-if(!@$hditem["item_company_id"] && $HELPDESK_CONFIG['default_company_current_company']){
-  @$hditem["item_company_id"] = $AppUI->user_company;
+if(!$hditem["item_company_id"] && $HELPDESK_CONFIG['default_company_current_company']){
+  $hditem["item_company_id"] = $AppUI->user_company;
 }
 
 // KZHAO : 8-8-2006
@@ -89,6 +89,7 @@ else{
 	echo "ERROR: Multiple companies found for current user!!!<br>";
 	$compId=0;
 }
+
 // Determine whether current user is a client
 if($compId!=$HELPDESK_CONFIG['the_company'])
   $is_client=1;
@@ -417,9 +418,9 @@ function setCalendar( idate, fdate ) {
   <input type="hidden" name="dosql" value="do_item_aed" />
   <input name="del" type="hidden" value="0" />
   <input type="hidden" name="item_id" value="<?php echo $item_id; ?>" />
-  <input type="hidden" name="item_requestor_type" value="<?php echo @$hditem["item_requestor_type"]; ?>" />
-  <input type="hidden" name="item_requestor_id" value="<?php echo @$hditem["item_requestor_id"]; ?>" />
-  <input type="hidden" name="item_created" value="<?php echo @$hditem["item_created"]; ?>" />
+  <input type="hidden" name="item_requestor_type" value="<?php echo $hditem["item_requestor_type"]; ?>" />
+  <input type="hidden" name="item_requestor_id" value="<?php echo $hditem["item_requestor_id"]; ?>" />
+  <input type="hidden" name="item_created" value="<?php echo $hditem["item_created"]; ?>" />
   <?php if (!$item_id): ?>
   <input type="hidden" name="item_created_by" value="<?php echo $AppUI->user_id; ?>" />
   <?php endif; ?>
@@ -436,14 +437,14 @@ function setCalendar( idate, fdate ) {
     <tr>
       <td align="right"><font color="red"><label for="it">* <?php echo $AppUI->_('Title'); ?>:</label></font></td>
       <td valign="top"><input type="text" class="text" id="it" name="item_title"
-                              value="<?php echo @$hditem["item_title"]; ?>" maxlength="64" /></td>
+                              value="<?php echo $hditem["item_title"]; ?>" maxlength="64" /></td>
     </tr>
 
     <tr>
       <td align="right" nowrap="nowrap"><font color="red"><label for="ir">* <?php echo $AppUI->_('Requestor'); ?>:</label></font></td>
       <td valign="top" nowrap="nowrap">
         <input type="text" class="text" id="ir" name="item_requestor"
-        value="<?php echo @$hditem["item_requestor"]; ?>" maxlength="64"
+        value="<?php echo $hditem["item_requestor"]; ?>" maxlength="64"
         onChange="if (this.value!=oldRequestor) {
                     document.frmHelpDeskItem.item_requestor_id.value = 0;
                     oldRequestor = this.value;
@@ -462,7 +463,7 @@ function setCalendar( idate, fdate ) {
       <td align="right" nowrap="nowrap"><label for="ire">&dagger; <?php echo $AppUI->_('Requestor E-mail'); ?>:</label></td>
       <td valign="top"><input type="text" class="text" id="ire"
                               name="item_requestor_email"
-                              value="<?php echo @$hditem["item_requestor_email"]; ?>"
+                              value="<?php echo $hditem["item_requestor_email"]; ?>"
                               maxlength="64" /></td>
     </tr>
 
@@ -470,14 +471,14 @@ function setCalendar( idate, fdate ) {
       <td align="right" nowrap="nowrap"><label for="irp">&dagger; <?php echo $AppUI->_('Requestor Phone'); ?>:</label></td>
       <td valign="top"><input type="text" class="text" id="irp"
                               name="item_requestor_phone"
-                              value="<?php echo @$hditem["item_requestor_phone"]; ?>"
+                              value="<?php echo $hditem["item_requestor_phone"]; ?>"
                               maxlength="30" /></td>
     </tr>
 
     <tr>
       <td align="right"><label for="c"><?php echo $AppUI->_('Company'); ?>:</label></td>
       <td><?php echo arraySelect( $allowedCompanies, 'item_company_id', 'size="1" class="text" id="c" onchange="changeList(\'item_project_id\',projects, this.options[this.selectedIndex].value)"',
-                          @$hditem["item_company_id"] ); ?></td>
+                          $hditem["item_company_id"] ); ?></td>
     </tr>
 
     <tr>
@@ -489,9 +490,9 @@ function setCalendar( idate, fdate ) {
       <td align="right" valign="top"><label for="iat"><?php echo $AppUI->_('Assigned To'); ?>:</label></td>
       <td><?php 
           if($is_client)
-            echo arraySelect( arrayMerge( array( 0 => '' ), $users), 'item_assigned_to', 'size="1" class="text" id="iat" disabled onchange="updateStatus(this)"', @$hditem["item_assigned_to"] ); 
+            echo arraySelect( arrayMerge( array( 0 => '' ), $users), 'item_assigned_to', 'size="1" class="text" id="iat" disabled onchange="updateStatus(this)"', $hditem["item_assigned_to"] ); 
           else
-            echo arraySelect( arrayMerge( array( 0 => '' ), $users), 'item_assigned_to', 'size="1" class="text" id="iat" onchange="updateStatus(this)"', @$hditem["item_assigned_to"] );
+            echo arraySelect( arrayMerge( array( 0 => '' ), $users), 'item_assigned_to', 'size="1" class="text" id="iat" onchange="updateStatus(this)"', $hditem["item_assigned_to"] );
           ?>
         <!--
 	<br />Send email notification to:<br />  
@@ -547,43 +548,43 @@ function setCalendar( idate, fdate ) {
     <tr>
       <td align="right" nowrap="nowrap"><label for="ict"><?php echo $AppUI->_('Call Type'); ?>:</label></td>
       <td><?php echo arraySelect( $ict, 'item_calltype', 'size="1" class="text" id="ict"',
-                          @$hditem["item_calltype"], true ); ?></td>
+                          $hditem["item_calltype"], true ); ?></td>
     </tr>
 
     <tr>
       <td align="right" nowrap="nowrap"><label for="ics"><?php echo $AppUI->_('Call Source'); ?>:</label></td>
       <td><?php echo arraySelect( $ics, 'item_source', 'size="1" class="text" id="ics"',
-                          @$hditem["item_source"], true); ?></td>
+                          $hditem["item_source"], true); ?></td>
     </tr>
 
     <tr>
       <td align="right"><label for="ist"><?php echo $AppUI->_('Status'); ?>:</label></td>
       <td><?php echo arraySelect( $ist, 'item_status', 'size="1" class="text" id="ist"',
-                          @$hditem["item_status"], true ); ?></td>
+                          $hditem["item_status"], true ); ?></td>
     </tr>
 
     <tr>
       <td align="right"><label for="ipr"><?php echo $AppUI->_('Priority'); ?>:</label></td>
       <td><?php echo arraySelect( $ipr, 'item_priority', 'size="1" class="text" id="ipr"',
-                          @$hditem["item_priority"], true ); ?></td>
+                          $hditem["item_priority"], true ); ?></td>
     </tr>
 
     <tr>
       <td align="right"><label for="isv"><?php echo $AppUI->_('Severity'); ?>:</label></td>
       <td><?php echo arraySelect( $isv, 'item_severity', 'size="1" class="text" id="isv"',
-                          @$hditem["item_severity"], true ); ?></td>
+                          $hditem["item_severity"], true ); ?></td>
     </tr>
 
     <tr>
       <td align="right" nowrap="nowrap"><label for="ios"><?php echo $AppUI->_('Operating System'); ?>:</label></td>
       <td><?php echo arraySelect( $ios, 'item_os', 'size="1" class="text" id="ios"',
-                          @$hditem["item_os"], true); ?></td>
+                          $hditem["item_os"], true); ?></td>
     </tr>
 
     <tr>
       <td align="right"><label for="iap"><?php echo $AppUI->_('Application'); ?>:</label></td>
       <td><?php echo arraySelect( $iap, 'item_application', 'size="1" class="text" id="iap"',
-                          @$hditem["item_application"], true); ?></td>
+                          $hditem["item_application"], true); ?></td>
     </tr>
     <tr>
       <!--
@@ -636,7 +637,7 @@ function setCalendar( idate, fdate ) {
 <tr>
   <td valign="top">
     <textarea id="summary" cols="75" rows="12" class="textarea"
-              name="item_summary"><?php echo @$hditem["item_summary"]; ?></textarea>
+              name="item_summary"><?php echo $hditem["item_summary"]; ?></textarea>
   </td>
   <td>&nbsp;&nbsp;</td>
       <td>
@@ -691,16 +692,16 @@ function setCalendar( idate, fdate ) {
      If we have a project but not a company (version <0.2) do a reverse
      lookup.
      Else, select nothing */
-  if (@$hditem['item_company_id']) {
+  if ($hditem['item_company_id']) {
     $target = $hditem['item_company_id'];
-  } else if (@$hditem['item_project_id']) {
+  } else if ($hditem['item_project_id']) {
     $target = $reverse[$hditem['item_project_id']];
   } else {
     $target = 0;
   }
 
   /* Select the project from the list */
-  $select = @$hditem['item_project_id'] ? $hditem['item_project_id'] : 0;
+  $select = $hditem['item_project_id'] ? $hditem['item_project_id'] : 0;
 ?>
 
 <script language="javascript">
