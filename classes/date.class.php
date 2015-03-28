@@ -70,7 +70,7 @@ class CDate extends Date {
 * The convertTZ calls are time intensive calls.	 When a compare call is
 * made in a recussive loop the lag can be significant.
 */
-	static function compare($d1, $d2, $convertTZ=false)
+	function compare($d1, $d2, $convertTZ=false)
 	{
 		if (!is_object($d1)) {
 			$d1 = new CDate($d1);
