@@ -7,17 +7,41 @@ if (!defined('DP_BASE_DIR')) {
  * Gantt.php - by J. Christopher Pereira
  * TASKS $Id: gantt.php 6149 2012-01-09 11:58:40Z ajdonnison $
  */
-global $caller, $locale_char_set;
-global $user_id, $dPconfig;
+global $caller, $locale_char_set, $AppUI;
+global $dPconfig;
 
-$showLabels = (int)dPgetParam($_GET, 'showLabels', 0);
-$showWork = (int)dPgetParam($_GET, 'showWork', 0);
-$sortByName = (int)dPgetParam($_GET, 'sortByName', 0);
-$showPinned = (bool)dPgetParam($_REQUEST, 'showPinned', false);
-$showArcProjs = (bool)dPgetParam($_REQUEST, 'showArcProjs', false);
-$showHoldProjs = (bool)dPgetParam($_REQUEST, 'showHoldProjs', false);
-$showDynTasks = (bool)dPgetParam($_REQUEST, 'showDynTasks', false);
-$showLowTasks = (bool)dPgetParam($_REQUEST, 'showLowTasks', true);
+$user_id=$AppUI->user_id;
+
+$showLabels = (int)dPgetParam($_GET, 'showLabels', '0');
+$showLabels = (($showLabels != '0') ? '1' : $showLabels);
+
+$showWork = (int)dPgetParam($_GET, 'showWork', '0');
+$showWork = (($showWork != '0') ? '1' : $showWork);
+
+$sortByName = (int)dPgetParam($_GET, 'sortByName', '0');
+$sortByName = (($sortByName != '0') ? '1' : $sortByName);
+
+/* Note: showLowTasks is set to 0 from viewgantt and was set to 1 here when Posted ? */
+if ( $_SERVER['REQUEST_METHOD'] == 'POST' ){
+	$showPinned = (int)dPgetParam($_REQUEST, 'showPinned', '0');
+	$showArcProjs = (int)dPgetParam($_REQUEST, 'showArcProjs', '0');
+	$showHoldProjs = (int)dPgetParam($_REQUEST, 'showHoldProjs', '0');
+	$showDynTasks = (int)dPgetParam($_REQUEST, 'showDynTasks', '0');		
+	$showLowTasks = (int)dPgetParam($_REQUEST, 'showLowTasks', '1');
+} else{
+	
+	$showPinned = (int)dPgetParam($_GET, 'showPinned', '0');
+	$showArcProjs = (int)dPgetParam($_GET, 'showArcProjs', '0');
+	$showHoldProjs = (int)dPgetParam($_GET, 'showHoldProjs', '0');
+	$showDynTasks = (int)dPgetParam($_GET, 'showDynTasks', '0');
+	$showLowTasks = (int)dPgetParam($_GET, 'showLowTasks', '1');
+}
+
+$showPinned = (($showPinned != '0') ? '1' : $showPinned);
+$showArcProjs = (($showArcProjs != '0') ? '1' : $showArcProjs);
+$showHoldProjs = (($showHoldProjs != '0') ? '1' : $showHoldProjs);
+$showDynTasks = (($showDynTasks != '0') ? '1' : $showDynTasks);
+$showLowTasks = (($showLowTasks != '0') ? '1' : $showLowTasks);
 
 ini_set('memory_limit', $dPconfig['reset_memory_limit']);
 
@@ -188,15 +212,58 @@ foreach ($proTasks as $row) {
 }
 unset($proTasks);
 
-$width = min((int)dPgetParam($_GET, 'width', 600), 1400);
+//$width = min((int)dPgetParam($_GET, 'width', 600), 1400);
+$width = min((int)dPgetParam($_GET, 'width', 1400), 1400);
 //consider critical (concerning end date) tasks as well
 if ($caller != 'todo') {
-	$start_min = $projects[$project_id]['project_start_date'];
+	if ( isset( $projects[$project_id]['project_start_date'] ) and ! strstr( "0000-00-00 00:00:00", $projects[$project_id]['project_start_date'] ) )
+		$start_min = $projects[$project_id]['project_start_date'];
+		
 	$end_max = (($projects[$project_id]['project_end_date'] > $criticalTasks[0]['task_end_date']) 
 	            ? $projects[$project_id]['project_end_date'] : $criticalTasks[0]['task_end_date']);
 }
-$start_date = dPgetCleanParam($_GET, 'start_date', $start_min);
-$end_date = dPgetCleanParam($_GET, 'end_date', $end_max);
+
+if ( preg_match( "/POST/", $_SERVER['REQUEST_METHOD'] ) ){
+
+	$start_date = dPgetCleanParam($_REQUEST, 'start_date', $start_min);
+	$end_date = dPgetCleanParam($_REQUEST, 'end_date', $end_max);
+	
+	/* Get rid of the time component - it actually ? breaks jpgraph 
+	 * and it is the way the Gantt chart is generated when 1st landing on the Task Gantt page */
+	$startDateA = explode( ' ', $start_date );
+	$endDateA	= explode( ' ', $end_date );
+	
+	if ( count( $startDateA ) ) $start_date = $startDateA[0];
+	if ( count( $endDateA ) ) $end_date = $endDateA[0];
+	
+	$s = "POST\n\n";
+
+} else{
+	$start_date = dPgetCleanParam($_GET, 'start_date', $start_min);
+	$end_date = dPgetCleanParam($_GET, 'end_date', $end_max);
+	$s = "GET\n\n";
+}		
+
+$s .= "start_date=$start_date\n\n";
+$s .= "end_date=$end_date\n";
+
+$s .= "start min = $start_min\n";
+$s .= "end max = $end_max\n";
+$s .= "showlabels=$showLabels\n";
+
+$s .= "showwork=$showWork\n";
+
+$s .= "sortbyname=$sortByName\n";
+$s .= "showpinned=$showPinned\n";
+$s .= "showarcprojs=$showArcProjs\n";
+$s .= "showholdprojs=$showHoldProjs\n";
+$s .= "showdyntasks=$showDynTasks\n";
+$s .= "showlowtasks=$showLowTasks\n";
+$s .= "project id = $project_id\n";
+$s .= "user id = $user_id\n";
+$s .= "WIDTH=$width\n";
+$s .= "**********\n\n"; 
+file_put_contents( 'files/temp/d', $s, FILE_APPEND );
 
 $count = 0;
 
@@ -276,12 +343,12 @@ if ($start_date && $end_date) {
 			$min_d_start = $d_start;
 			$max_d_end = $d_end;
 		} else {
-			if (Date::compare($min_d_start,$d_start) > 0) {
+/*			if (Date::compare($min_d_start,$d_start) > 0) {*/
 				$min_d_start = $d_start;
-			}
-			if (Date::compare($max_d_end,$d_end) < 0) {
+			//}
+			//if (Date::compare($max_d_end,$d_end) < 0) {
 				$max_d_end = $d_end;
-			}
+	//		}
 		}
 	}
 }
@@ -550,10 +617,124 @@ for ($i = 0; $i < count(@$gantt_arr); $i ++) {
 	$q->clear();
 	$graph->Add($bar);
 }
+
 unset($gantt_arr);
 $today = date('y-m-d');
 $vline = new GanttVLine($today, $AppUI->_('Today', UI_OUTPUT_RAW));
 $vline->title->SetFont(FF_CUSTOM, FS_BOLD, 10);
 $graph->Add($vline);
-$graph->Stroke();
+
+if ( ! preg_match( "/POST/", $_SERVER['REQUEST_METHOD'] ) ){
+
+	$graph->Stroke();
+
+} else{
+
+	$filename = DP_BASE_DIR."/files/temp/GanttPNG_".md5(time()).".png";
+	$outpfiles[] = $filename;
+
+	$graph->Stroke( $filename );
+
+	// Prepare Gantt image and store in $filename
+
+	//Override of some variables, not very tidy but necessary when importing code from other sources...
+
+	require DP_BASE_DIR . '/classes/PDFRenderer.class.php';
+	require DP_BASE_DIR . '/classes/Date.class.php';
+	
+	$skip_page = 0;
+	$do_report = 1;
+	$show_task = 1;
+	$show_assignee = 1;
+	$show_gantt = 1;
+	$show_gantt_taskdetails = ($showTaskNameOnly == '1') ? 0 : 1;
+
+	// Initialize PDF document 
+	$font_dir = DP_BASE_DIR . '/lib/ezpdf/fonts';
+	$temp_dir = DP_BASE_DIR . '/files/temp';
+
+	$output = new w2p_Output_PDFRenderer('A4', 'landscape');
+	$pdf = $output->getPDF();
+	
+	// 		Define page header to be displayed on top of each page
+	$pdf->saveState();
+	if ( $skip_page ) $pdf->ezNewPage();
+	$skip_page++;
+	$page_header = $pdf->openObject();
+	$pdf->selectFont( "$font_dir/Helvetica-Bold.afm" );
+	$ypos= $pdf->ez['pageHeight'] - ( 30 + $pdf->getFontHeight(12) );
+	$doc_title = strEzPdf( $projects[$project_id]['project_name'], UI_OUTPUT_RAW);
+	$pwidth=$pdf->ez['pageWidth'];
+	$xpos= round( ($pwidth - $pdf->getTextWidth( 12, $doc_title ))/2, 2 );
+	$pdf->addText( $xpos, $ypos, 12, $doc_title) ;
+	$pdf->selectFont( "$font_dir/Helvetica.afm" );
+	$date = new w2p_Utilities_Date();
+	//$date = new CDate( date() );
+	$xpos = round( $pwidth - $pdf->getTextWidth( 10, $date->format($df)) - $pdf->ez['rightMargin'] , 2);
+	$doc_date = strEzPdf($date->format( $df ));
+	$pdf->addText( $xpos, $ypos, 10, $doc_date );
+	$pdf->closeObject($page_header);
+	$pdf->addObject($page_header, 'all');
+	$gpdfkey = DP_BASE_DIR. '/modules/tasks/images/ganttpdf_key.png';
+	$gpdfkeyNM = DP_BASE_DIR. '/modules/tasks/images/ganttpdf_keyNM.png';
+
+	$pdf->ezStartPageNumbers( 802 , 30 , 10 ,'left','Page {PAGENUM} of {TOTALPAGENUM}') ;
+
+	
+	$ganttfile_count = count($outpfiles);
+	for ($i=0; $i < $ganttfile_count; $i++) {
+		$gf = $ganttfile[$i];
+		$pdf->ezColumnsStart(array('num' =>1, 'gap' =>0));
+		$pdf->ezImage( $gf, 0, 765, 'width', 'left'); // No pad, width = 800px, resize = 'none' (will go to next page if image height > remaining page space)
+		if ($showNoMilestones == '1') {
+			$pdf->ezImage( $gpdfkeyNM, 0, 500, 'width', 'center');
+		} else {
+			$pdf->ezImage( $gpdfkey, 0, 500, 'width', 'center');
+		}
+		$pdf->ezColumnsStop();
+	}
+
+	// End of project display
+	// Create document body and pdf temp file
+	$pdf->stopObject($page_header);
+
+
+	$gpdffile = $temp_dir . '/GanttChart_'.md5(time()).'.pdf';
+	if ($fp = fopen($gpdffile, 'wb')) {
+		fwrite($fp, $pdf->ezOutput());
+		fclose($fp);
+	} else {
+		//TODO: create error handler for permission problems
+		echo "Could not open file to save PDF.  ";
+		if (!is_writable( $temp_dir ))
+		echo "The files/temp directory is not writable.  Check your file system permissions.";
+	}
+
+	$_POST['printpdf'] = '0';
+	$printpdf = '0';
+	$_POST['printpdfhr']= 0;
+	$printpdfhr = 0;
+
+	
+	// check that file exists and is readable
+	if (file_exists($gpdffile) && is_readable($gpdffile)) {
+		// get the file size and send the http headers
+		header('Content-Description: File Transfer');
+		header('Content-Type: application/octet-stream');
+		header('Content-Disposition: attachment; filename='.basename($gpdffile));
+		header('Content-Transfer-Encoding: binary');
+		header('Expires: 0');
+		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+		header('Pragma: public');
+		header('Content-Length: ' . filesize($gpdffile));
+		header('Content-disposition: attachment; filename="GanttChart_'.$AppUI->user_id.$project_id.'.pdf"');
+		flush();
+		ob_end_clean();
+		readfile($gpdffile);
+		exit;
+	}
+	 
+
+}
+  
 ?>

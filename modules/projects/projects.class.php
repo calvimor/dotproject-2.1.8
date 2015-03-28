@@ -376,6 +376,27 @@ class CProject extends CDpObject {
 		return $allowedProjectRows;
 	}
 
+	/* From web2project ... required to create Gantt Pdfs 
+	 * Removed from the query, the project.project_parent field from the original code 
+	 * */
+    public function getAllowedProjects($userId, $activeOnly = true)
+    {
+
+        $q = new DBQuery;
+        var_dump($q);
+        $q->addTable('projects', 'pr');
+        $q->addQuery('pr.project_id, project_color_identifier, project_name, project_start_date, project_end_date, project_company');
+        if ($activeOnly) {
+            $q->addWhere('project_active = 1');
+        }
+        $q->addGroup('pr.project_id');
+        $q->addOrder('project_name');
+
+        $this->setAllowedSQL($userId, $q, null, 'pr');
+
+        return $q->loadHashList('project_id');
+    }
+
 	/* Retrieve tasks with latest task_end_dates within given project
 	 * @param int Project_id
 	 * @param int SQL-limit to limit the number of returned tasks

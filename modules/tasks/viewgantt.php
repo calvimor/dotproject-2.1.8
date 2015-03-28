@@ -3,27 +3,37 @@ if (!defined('DP_BASE_DIR')) {
   die('You should not access this file directly.');
 }
 
-GLOBAL $min_view, $m, $a, $user_id, $tab, $tasks;
+GLOBAL $min_view, $m, $a, $tab, $tasks;
+
+$user_id = $AppUI->user_id;
 
 $min_view = defVal(@$min_view, false);
 
 $project_id = defVal(@$_GET['project_id'], 0);
 
 // sdate and edate passed as unix time stamps
-$sdate = dPgetCleanParam($_POST, 'sdate', 0);
-$edate = dPgetCleanParam($_POST, 'edate', 0);
 
+if ( preg_match( "/POST/", $_SERVER['REQUEST_METHOD'] ) ){
 
+	$sdate = dPgetCleanParam($_POST, 'start_date', 0);
+	$edate = dPgetCleanParam($_POST, 'end_date', 0);
 
-//if set GantChart includes user labels as captions of every GantBar
-$showLabels = (int)dPgetParam($_POST, 'showLabels', '0');
-$showLabels = (($showLabels != '0') ? '1' : $showLabels);
+	$display_option = dPgetCleanParam($_POST, 'display_option', 'this_month');
 
-$showWork = (int)dPgetParam($_POST, 'showWork', '0');
-$showWork = (($showWork != '0') ? '1' : $showWork);
+	//if set GantChart includes user labels as captions of every GantBar
+	$showLabels = (int)dPgetParam($_POST, 'showLabels', '0');
+	$showWork = (int)dPgetParam($_POST, 'showWork', '0');
+	$sortByName = (int)dPgetParam($_POST, 'sortByName', '0');
+	$printpdf = dPgetParam($_POST, 'printpdf', '0');
+	$printpdfhr = dPgetParam($_POST, 'printpdfhr', '0');
 
-$sortByName = (int)dPgetParam($_POST, 'sortByName', '0');
-$sortByName = (($sortByName != '0') ? '1' : $sortByName);
+	$showLabels = (($showLabels != '0') ? '1' : $showLabels);
+	$showWork = (($showWork != '0') ? '1' : $showWork);
+	$sortByName = (($sortByName != '0') ? '1' : $sortByName);
+	$printpdf = (($printpdf != '0') ? '1' : $printpdf);
+	$printpdfhr = (($printpdfhr != '0') ? '1' : $printpdfhr);
+
+}
 
 if ($a == 'todo') {
 	if (isset($_POST['show_form'])) {
@@ -55,8 +65,6 @@ if ($a == 'todo') {
 
 // months to scroll
 $scroll_date = 1;
-
-$display_option = dPgetCleanParam($_POST, 'display_option', 'this_month');
 
 // format dates
 $df = $AppUI->getPref('SHDATEFORMAT');
@@ -142,11 +150,19 @@ function showFullProject() {
 	document.editFrm.submit();
 }
 
+function printPDFHR() {
+    document.editFrm.printpdf.value = "0";
+    document.editFrm.printpdfhr.value = "1";
+    document.editFrm.submit();
+}
+
 </script>
 
 <form name="editFrm" method="post" action="?<?php 
-echo ('m=' . $m . '&amp;a=' . $a . '&amp=tab=' . $tab . '&amp;project_id=' . $project_id); ?>">
+echo ('m=' . $m . '&amp;a=' . $a . '&amp;tab=' . $tab . '&amp;project_id=' . $project_id); ?>">
 <input type="hidden" name="display_option" value="<?php echo $display_option;?>" />
+<input type="hidden" name="printpdf" value="<?php echo $printpdf; ?>" />
+<input type="hidden" name="printpdfhr" value="<?php echo $printpdfhr; ?>" />
 
 <table border="0" cellpadding="4" cellspacing="0">
 <tr>
@@ -196,7 +212,9 @@ echo $AppUI->_('Sort by Task Name'); ?></label>
 	</td>	
 	<td align="left">
 		<input type="button" class="button" value="<?php 
-echo $AppUI->_('submit');?>" onclick='javascript:document.editFrm.display_option.value="custom";submit();'>
+echo $AppUI->_('submit');?>" onclick='javascript:document.editFrm.display_option.value="custom";submit();'/>
+<input type="button" class="button btn btn-primary btn-mini" value="<?php 
+echo $AppUI->_('Print to PDF');?>" onclick='javascript:printPDFHR()' style="float: right;" />
 	</td>
 
 	<td align="right" valign="top" width="20">
@@ -271,18 +289,26 @@ if ($a != 'todo') {
 	$cnt[0]['N'] = ((empty($tasks)) ? 0 : 1);
 }
 if ($cnt[0]['N'] > 0) {
-	$src = ('?m=tasks&amp;a=gantt&amp;suppressHeaders=1&amp;project_id=' . $project_id 
-	        . (($display_option == 'all') ? '' 
-	           : ('&amp;start_date=' . $start_date->format('%Y-%m-%d') 
-	              . '&amp;end_date=' . $end_date->format('%Y-%m-%d'))) . "&width='" 
-			. "+((navigator.appName=='Netscape'?window.innerWidth:document.body.offsetWidth)*0.95)" 
-			. "+'&amp;showLabels=" . $showLabels . '&amp;showWork=' . $showWork 
-	        . '&amp;sortByName=' . $sortByName . '&amp;showPinned=' . $showPinned 
-	        . '&amp;showArcProjs=' . $showArcProjs . '&amp;showHoldProjs=' . $showHoldProjs 
-	        . '&amp;showDynTasks=' . $showDynTasks . '&amp;showLowTasks=' . $showLowTasks 
-	        . '&amp;caller=' . $a . '&amp;user_id=' . $user_id);
+	$src = (	'?' .
+				'm=tasks&amp;' .
+				'a=gantt&amp;' .
+				'suppressHeaders=1&amp;' .
+				'project_id=' . $project_id . (($display_option == 'all') ? '' : ('&amp;start_date=' . $start_date->format('%Y-%m-%d') . '&amp;' . 
+				'end_date=' . $end_date->format('%Y-%m-%d'))) . "&amp;" .
+				"width='" . "+((navigator.appName=='Netscape'?window.innerWidth:document.body.offsetWidth)*0.95)" . "+'&amp;' , 
+				'showLabels=" . $showLabels . '&amp;' .
+				'showWork=' . $showWork . '&amp;' . 
+				'sortByName=' . $sortByName . '&amp;' .
+				'showPinned=' . $showPinned . '&amp;' .
+				'showArcProjs=' . $showArcProjs . '&amp;' .
+				'showHoldProjs=' . $showHoldProjs . '&amp;' .
+				'showDynTasks=' . $showDynTasks . '&amp;' .
+				'showLowTasks=' . $showLowTasks . '&amp;' .
+				'caller=' . $a . '&amp;' .
+				'user_id=' . $user_id
+			);
 ?>
-	<script type="text/javascript">document.write('<img src="<?php echo $src; ?>" alt="" />')</script>
+	<script type="text/javascript">document.write('<img alt="Gantt Chart" name="ganttchart" src="<?php echo $src; ?>" alt="" />')</script>
 <?php
 	//If we have a problem displaying this we need to display a warning.
 	//Put it at the bottom just in case
@@ -299,8 +325,44 @@ if ($cnt[0]['N'] > 0) {
 } else {
 	echo $AppUI->_('No tasks to display');
 }
+
+//echo $src;
+
 ?>
 	</td>
 </tr>
+	<tr>
+		<td>
+			<?php
+				//POST of all necesary variables to generate gantt in PDF
+				$_POST['m'] = 'tasks';
+				$_POST['a'] = 'gantt';
+				$_POST['suppressHeaders'] = '1';
+				$_POST['start_date'] = $start_date->format('%Y-%m-%d');
+				$_POST['end_date'] = $end_date->format('%Y-%m-%d');
+				$_POST['display_option'] = $display_option;
+				$_POST['showLabels']= $showLabels;
+				$_POST['showWork']= $showWork;
+				$_POST['sortByName']= $sortByName;
+				$_POST['showPinned']= $showPinned;
+				$_POST['showArcProjs']= $showArcProjs;
+				$_POST['showHoldProjs']= $showHoldProjs;
+				$_POST['showDynTasks']= $showDynTasks;
+				$_POST['showLowTasks']= $showLowTasks;
+				$_POST['caller']= $a;
+				$_POST['printpdf']= $printpdf;
+				$_POST['printpdfhr']= $printpdfhr;
+
+				if ( $printpdf == 1 || $printpdfhr == 1) {
+					
+					include 'modules/tasks/gantt_pdf.php';
+
+					$_POST['printpdf']= 0; $printpdf = 0;
+					$_POST['printpdfhr']= 0; $printpdfhr = 0;
+				}
+			?>
+		</td>
+	</tr>
+
 </table>
-<br />
+

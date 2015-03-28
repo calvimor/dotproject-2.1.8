@@ -322,6 +322,7 @@ function defVal($var, $def) {
 * Utility function to return a value from a named array or a specified default
 */
 function dPgetParam(&$arr, $name, $def=null) {
+	if ( !isset($arr[$name]) ) return '';
 	return defVal($arr[$name], $def);
 }
 
@@ -971,4 +972,21 @@ function safe_utf8_decode($string)
 		return $string;
 	}
 }
+
+/**
+* utility functions for the preparation of task data for GANTT PDF
+*
+* @todo some of these functions are not needed, need to trim this down
+*
+*/
+// PYS : utf_8 decoding as suggested in Vbulletin #3987
+function strEzPdf($text)
+{
+    if (function_exists('iconv') && function_exists('mb_detect_encoding')) {
+        $text = iconv(mb_detect_encoding($text." "), 'UTF-8', $text);
+    }
+
+    return $text;
+}
+
 ?>
