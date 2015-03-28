@@ -1,8 +1,11 @@
 <?php /* HELPDESK $Id: export.php v 0.1*/
 //KZHAO  10-24-2006
-global $HELPDESK_CONFIG, $dPconfig;
+global $HELPDESK_CONFIG;
 require_once('./modules/tasks/tasks.class.php');
 $item_id = dPgetParam($_GET, 'item_id', 0);
+
+$dbPrefix = dPgetConfig('dbprefix');
+$perms =& $AppUI->acl();
 
 //$allowedCompanies = arrayMerge( array( 0 => '' ), getAllowedCompanies() );
 //$projects = getAllowedProjectsForJavascript();
@@ -32,24 +35,24 @@ $org_hditem = new CHelpDeskItem();
 $org_hditem->load( $item_id );
 
 //Check required information before export
-if(!@$hditem["item_project_id"]){
+if(!$hditem["item_project_id"]){
 	 $AppUI->setMsg( "Project must be specified for this item before exporting to task!" , UI_MSG_ERROR );
          $AppUI->redirect("m=helpdesk&a=view&item_id=$item_id");		 
 }
 //KZHAO 10-24-2006
 // Check status
-if($ist[@$hditem["item_status"]]=="Closed"){
+if($ist[$hditem["item_status"]]=="Closed"){
          $AppUI->setMsg( "Closed helpdesk items cannot be exported to tasks!" , UI_MSG_ERROR );
          $AppUI->redirect("m=helpdesk&a=view&item_id=$item_id");
 }
 		  
-if(!@$hditem["item_assigned_to"] && $HELPDESK_CONFIG['default_assigned_to_current_user']){
-  @$hditem["item_assigned_to"] = $AppUI->user_id;
-  @$hditem["item_status"] = 1;
+if(!$hditem["item_assigned_to"] && $HELPDESK_CONFIG['default_assigned_to_current_user']){
+  $hditem["item_assigned_to"] = $AppUI->user_id;
+  $hditem["item_status"] = 1;
 }
 
-if(!@$hditem["item_company_id"] && $HELPDESK_CONFIG['default_company_current_company']){
-  @$hditem["item_company_id"] = $AppUI->user_company;
+if(!$hditem["item_company_id"] && $HELPDESK_CONFIG['default_company_current_company']){
+  $hditem["item_company_id"] = $AppUI->user_company;
 }
 // Setup the title block
 
@@ -67,22 +70,22 @@ if(!@$hditem["item_company_id"] && $HELPDESK_CONFIG['default_company_current_com
   $ref_task.="Link:".$dPconfig['base_url']."/index.php?m=helpdesk&a=view&item_id=".$item_id."\n";
   $ref_task.= "-----------------------\n";
 
-  if(@$hditem["item_priority"]==0 || @$hditem["item_priority"]==2)
+  if($hditem["item_priority"]==0 || $hditem["item_priority"]==2)
   	$taskPrio=0;
-  elseif(@$hditem["item_priority"]==1)
+  elseif($hditem["item_priority"]==1)
         $taskPrio=-1;
   else
         $taskPrio=1;
 			       
   $taskInfo= array( "task_id"=>0,
-  		    "task_name"=> @$hditem["item_title"],
-  		    "task_project"=> @$hditem["item_project_id"],
+  		    "task_name"=> $hditem["item_title"],
+  		    "task_project"=> $hditem["item_project_id"],
 		    "task_start_date"=> $dateNowSQL,
-		    "task_end_date"=>@$hditem["item_deadline"],
-		    "task_priority"=>$taskPrio,// @$hditem["item_priority"],
-		    "task_owner"=> $AppUI->user_id,//@$hditem["item_requestor_id"],
+		    "task_end_date"=>$hditem["item_deadline"],
+		    "task_priority"=>$taskPrio,// $hditem["item_priority"],
+		    "task_owner"=> $AppUI->user_id,//$hditem["item_requestor_id"],
 		    "task_creator"=>$AppUI->user_id,
-		    "task_description"=>$ref_task.@$hditem["item_summary"]
+		    "task_description"=>$ref_task.$hditem["item_summary"]
 		    );
 
   //print_r($taskInfo);
@@ -109,10 +112,10 @@ if(!@$hditem["item_company_id"] && $HELPDESK_CONFIG['default_company_current_com
 		  $AppUI->redirect();
 	  }
     //Kang--4/18/2007  deal with the assignee
-    if($AppUI->user_id!=@$hditem["item_assigned_to"]){
+    if($AppUI->user_id!=$hditem["item_assigned_to"]){
         $clear_assignee_sql="DELETE FROM " . $dbPrefix . "user_tasks WHERE user_id=".$AppUI->user_id." and task_id=".$newTask->task_id;
         db_exec($clear_assignee_sql);
-        $assignee_sql="INSERT INTO " . $dbPrefix . "user_tasks VALUES (".@$hditem["item_assigned_to"].",0,".$newTask->task_id.",100,0)";
+        $assignee_sql="INSERT INTO " . $dbPrefix . "user_tasks VALUES (".$hditem["item_assigned_to"].",0,".$newTask->task_id.",100,0)";
         db_exec($assignee_sql);
     }
 	  //$org_hditem->store();
