@@ -18,9 +18,10 @@ $df = $AppUI->getPref('SHDATEFORMAT');
 $q  = new DBQuery;
 $q->addTable('projects', 'prj');
 $q->addQuery('project_id, project_name, project_start_date, project_status, project_target_budget' 
-			 . ', project_start_date, project_priority, contact_first_name, contact_last_name');
+			 . ', project_start_date, project_priority, project_department, d.dept_name, contact_first_name, contact_last_name');
 $q->addJoin('users', 'u', 'u.user_id = prj.project_owner');
 $q->addJoin('contacts', 'con', 'u.user_contact = con.contact_id');
+$q->addJoin('departments', 'd', 'd.dept_id=prj.project_department');
 $q->addWhere('prj.project_company = ' . $company_id);
 
 include_once ($AppUI->getModuleClass('projects'));
@@ -58,8 +59,13 @@ if (!($rows = $q->loadList())) {
 		
 		$s .= '</td>';
 		$s .= '<td width="100%">';
+		if ( $row['dept_name'] > 0 )
+		   $projectD = $row['dept_name'];
+                else
+                   $projectD = '';
+
 		$s .= ('<a href="?m=projects&amp;a=view&amp;project_id=' . dPformSafe($row['project_id']) . '">' 
-		       . htmlspecialchars($row['project_name']) . '</a></td>');
+		       . htmlspecialchars($row['project_name']) . '</a>( ' . $projectD . ' )</td>');
 		$s .= ('<td nowrap="nowrap">' . htmlspecialchars($row['contact_first_name']) . '&nbsp;' 
 		       . htmlspecialchars($row['contact_last_name']) . '</td>');
 		$s .= '<td nowrap="nowrap">' . $start_date->format($df) . '</td>';
