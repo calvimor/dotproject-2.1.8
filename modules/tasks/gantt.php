@@ -236,14 +236,14 @@ if ( preg_match( "/POST/", $_SERVER['REQUEST_METHOD'] ) ){
 	if ( count( $startDateA ) ) $start_date = $startDateA[0];
 	if ( count( $endDateA ) ) $end_date = $endDateA[0];
 	
-	$s = "POST\n\n";
+//	$s = "POST\n\n";
 
 } else{
 	$start_date = dPgetCleanParam($_GET, 'start_date', $start_min);
 	$end_date = dPgetCleanParam($_GET, 'end_date', $end_max);
-	$s = "GET\n\n";
+	//$s = "GET\n\n";
 }		
-
+/*
 $s .= "start_date=$start_date\n\n";
 $s .= "end_date=$end_date\n";
 
@@ -264,6 +264,7 @@ $s .= "user id = $user_id\n";
 $s .= "WIDTH=$width\n";
 $s .= "**********\n\n"; 
 file_put_contents( 'files/temp/d', $s, FILE_APPEND );
+*/
 
 $count = 0;
 
