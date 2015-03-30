@@ -94,7 +94,7 @@ if ($proFilter == '-4') {
 if ($user_id && $m_orig == 'admin' && $a_orig == 'viewuser') {
 	$q->addWhere('project_owner = ' . $user_id);
 }
-$taskPin =1;
+
 if ($taskPin == '1') {
 	$q->addWhere('tp.task_pinned = 1');
 }
