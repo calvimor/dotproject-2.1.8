@@ -3,6 +3,9 @@ if (!defined('DP_BASE_DIR')) {
 	die('You should not access this file directly.');
 }
 
+$AppUI->setState('m', 'system');
+$AppUI->setState('a', 'viewmods');
+
 ##
 ## Activate or move a module entry
 ##
@@ -101,5 +104,5 @@ switch ($cmd) {
 		$AppUI->setMsg('Unknown Command', UI_MSG_ERROR);
 		break;
 }
-$AppUI->redirect();
+$AppUI->redirect('m=system&amp;a=viewmods');
 ?>
