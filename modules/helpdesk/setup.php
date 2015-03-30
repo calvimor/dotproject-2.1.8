@@ -83,7 +83,7 @@ class CSetupHelpDesk {
 		  `item_id` int(11) NOT NULL default '0',
 		  `user_id` int(11) NOT NULL default '0',
 		  `notify` char(1) NOT NULL default ''
-		) TYPE=MyISAM";
+		)ENGINE=MyISAM";
 
     foreach ($bulk_sql as $s) {
       db_exec($s);
