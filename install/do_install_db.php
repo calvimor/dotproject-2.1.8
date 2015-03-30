@@ -189,7 +189,7 @@ if ($dbc && ($do_db || $do_db_cfg)) {
 		dPmsg('No data updates required');
 	}
  } else {
-//  include_once DP_BASE_DIR.'/db/upgrade_permissions.php'; // Always required on install.
+  include_once DP_BASE_DIR.'/db/upgrade_permissions.php'; // Always required on install.
  }
 
  dPmsg('Updating version information');
