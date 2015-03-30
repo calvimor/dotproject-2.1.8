@@ -13,7 +13,7 @@ $project_id = defVal(@$_GET['project_id'], 0);
 
 // sdate and edate passed as unix time stamps
 
-if ( preg_match( "/POST/", $_SERVER['REQUEST_METHOD'] ) ){
+if ( preg_match( "/POST/", $_SERVER['REQUEST_METHOD'] ) and isset( $_POST['printpdfhr'] ) and $_POST['printpdfhr'] == '1' ){
 
 	$sdate = dPgetCleanParam($_POST, 'start_date', 0);
 	$edate = dPgetCleanParam($_POST, 'end_date', 0);
