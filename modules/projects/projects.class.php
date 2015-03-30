@@ -614,7 +614,8 @@ function projects_list_data($user_id=false) {
 		$q->clear();
 	}
 
-	if (isset($department)) {
+	if ( isset($department) ){
+		
 		/*
 		 * If a department is specified, we want to display projects from the department
 		 * and all departments under that, so we need to build that list of departments
@@ -623,13 +624,11 @@ function projects_list_data($user_id=false) {
 		$q->addTable('departments');
 		$q->addQuery('dept_id, dept_parent');
 		$q->addOrder('dept_parent,dept_name');
-		$rows = $q->loadList();
+		$rows = $q->loadHashList();
 		addDeptId($rows, $department);
 		$dept_ids[] = $department;
 	}
 	$q->clear();
-
-
 
 	$q->addTable('projects', 'p');
 	$q->addQuery('p.project_id, p.project_status, p.project_color_identifier, p.project_type'
@@ -653,8 +652,11 @@ function projects_list_data($user_id=false) {
 	if (isset($project_status) && $currentTabId != 500) {
 		$q->addWhere('p.project_status = '.$project_status);
 	}
+
 	if (isset($department)) {
+		
 		$q->addJoin('project_departments', 'pd', 'pd.project_id = p.project_id');
+
 		if (!$addPwOiD) {
 			$q->addWhere('pd.department_id in (' . implode(',',$dept_ids) . ')');
 		} else {
@@ -662,7 +664,19 @@ function projects_list_data($user_id=false) {
 			$q->addWhere('p.project_owner IN ('
 			             . ((!empty($owner_ids)) ? implode(',', $owner_ids) : 0) . ')');
 		}
-	} else if ($company_id &&!$addPwOiD) {
+		
+	} else 
+	{
+		// Join the departments table
+		$q->addJoin('project_departments', 'pd', 'pd.project_id = p.project_id');
+
+		$q->addJoin( 'departments', 'd', 'd.dept_id=pd.department_id');
+		$q->addQuery( 'd.dept_name' );
+	
+		
+	}
+		
+	if ($company_id &&!$addPwOiD) {
 		$q->addWhere('p.project_company = ' . $company_id);
 	}
 
@@ -683,6 +697,7 @@ function projects_list_data($user_id=false) {
 	$q->addGroup('p.project_id');
 	$q->addOrder($orderby . ' ' . $orderdir);
 	$obj_project->setAllowedSQL($AppUI->user_id, $q, null, 'p');
+	
 	$projects = $q->loadList();
 
 
