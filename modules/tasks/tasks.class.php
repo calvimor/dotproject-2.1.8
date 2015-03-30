@@ -2800,6 +2800,12 @@ function showtask(&$a, $level=0, $is_opened = true, $today_view = false, $hideOp
 			   . bestColor($a['project_color_identifier']) . '">' . $a['project_name'] . '</span>' 
 			   . '</a></td>');
 	}
+
+	// task owner
+	if (! $today_view) {
+		$s .= ('<td nowrap="nowrap" align="center">' . $a['dept_name'] . '</td>');
+	}
+
 	// task owner
 	if (! $today_view) {
 		$s .= ('<td nowrap="nowrap" align="center">' . '<a href="?m=admin&amp;a=viewuser&amp;user_id=' 
