@@ -35,7 +35,7 @@ if (empty($query_string)) {
 }
 
 // Number of columns (used to calculate how many columns to span things through)
-$cols = 13;
+$cols = 14;
 
 $dbprefix = dPgetConfig('dbprefix','');
 
@@ -108,14 +108,17 @@ if (count($allowedProjects)) {
 $working_hours = ($dPconfig['daily_working_hours']?$dPconfig['daily_working_hours']:8);
 
 $q = new DBQuery;
+
 $q->addTable('projects', 'prj');
-$q->addQuery('company_name, project_id, project_color_identifier, project_name, '
+$q->addQuery('company_name, prj.project_id, project_color_identifier, project_name, d.dept_name,'
              . ' SUM(t1.task_duration * t1.task_percent_complete'
              . ' * IF(t1.task_duration_type = 24, ' . $working_hours . ', t1.task_duration_type))'
              . ' / SUM(t1.task_duration * IF(t1.task_duration_type = 24, ' . $working_hours 
              . ', t1.task_duration_type)) AS project_percent_complete ');
 $q->addJoin('companies', 'com', 'company_id = project_company');
 $q->addJoin('tasks', 't1', 'prj.project_id = t1.task_project');
+$q->addJoin('project_departments', 'pd', 'pd.project_id=prj.project_id' );
+$q->addJoin('departments', 'd', 'd.dept_id=pd.department_id');
 $q->addWhere($where_list . (($where_list) ? ' AND ' : '') . 't1.task_id = t1.task_parent');
 $q->addGroup('project_id');
 $q->addOrder('project_name');
@@ -163,7 +166,7 @@ $select = ('distinct tsk.task_id, task_parent, task_name, task_start_date, task_
 		   . 'count(distinct assignees.user_id) as assignee_count, '
 		   . 'co.contact_first_name, co.contact_last_name, ' 
 		   . 'count(distinct fi.file_task) as file_count, ' 
-		   . 'if (tlog.task_log_problem IS NULL, 0, tlog.task_log_problem) AS task_log_problem');
+		   . 'if (tlog.task_log_problem IS NULL, 0, tlog.task_log_problem) AS task_log_problem, d.dept_name ');
 $from = $dbprefix.'tasks as tsk';
 $mods = $AppUI->getActiveModules();
 if (!empty($mods['history']) && getPermission('history', 'view')) {
@@ -186,6 +189,8 @@ $join .= ' LEFT JOIN '.$dbprefix.'files as fi on tsk.task_id = fi.file_task';
 $join .= ' LEFT JOIN '.$dbprefix.'user_task_pin as pin ON tsk.task_id = pin.task_id AND pin.user_id = ';
 $join .= $user_id ? $user_id : $AppUI->user_id;
 
+$join .= ' LEFT JOIN ' . $dbprefix . 'task_departments as td on td.task_id=tsk.task_id';
+$join .= ' LEFT JOIN ' . $dbprefix . 'departments as d on d.dept_id=td.department_id';
 $where = $project_id ? ' task_project = '.$project_id : 'project_status <> 7';
 
 if ($pinned_only) {
@@ -194,6 +199,7 @@ if ($pinned_only) {
 
 $f = (($f) ? $f : '');
 $never_show_with_dots = array(/*'children', */''); //used when displaying tasks
+
 switch ($f) {
 	case 'all':
 		break;
@@ -488,6 +494,8 @@ function chAssignment(project_id, rmUser, del) {
   <th width="20"><?php echo $AppUI->_('Work');?></th>
   <th align="center"><?php sort_by_item_title('P', 'task_log_problem_priority', SORT_NUMERIC); ?></th>
   <th width="200"><?php sort_by_item_title('Task Name', 'task_name', SORT_STRING);?></th>
+  
+    <th nowrap="nowrap"><?php sort_by_item_title('Department', 'dept_name', SORT_STRING);?></th>
   <th nowrap="nowrap"><?php sort_by_item_title('Task Owner', 'user_username', SORT_STRING);?></th>
   <th nowrap="nowrap"><?php echo $AppUI->_('Assigned Users')?></th>
   <th nowrap="nowrap"><?php sort_by_item_title('Start Date', 'task_start_date', SORT_NUMERIC);?></th>
@@ -530,23 +538,22 @@ echo (($project_id) ? $AppUI->_('show other projects') : $AppUI->_('show only th
   </a>
   </td>
   <td colspan="<?php echo $showEditCheckbox ? $cols-4 : $cols-1; ?>">
-  <table width="100%" border="0">
-  <tr>
-	<!-- patch 2.12.04 display company name next to project name -->
-	<td nowrap style="border: outset #eeeeee 2px;background-color:#<?php 
-echo @$p['project_color_identifier']; ?>">
-	<a href="?m=projects&amp;a=view&amp;project_id=<?php echo $k;?>">
-	<span style="color:<?php 
-echo bestColor(@$p['project_color_identifier']); ?>;text-decoration:none;">
-	<strong><?php echo $AppUI->___(@$p['company_name'].' :: '.@$p['project_name']);?></strong></span></a>
-	</td>
-	<td width="<?php echo (101 - intval(@$p['project_percent_complete']));?>%">
-	<?php echo (intval(@$p['project_percent_complete']));?>%
-	</td>
-  </tr>
+  <table name="project-header" width="100%" border="">
+	<tr>
+		<!-- patch 2.12.04 display company name next to project name -->
+		<td nowrap style="border: outset #eeeeee 2px;background-color:#<?php echo @$p['project_color_identifier']; ?>">
+			<a href="?m=projects&amp;a=view&amp;project_id=<?php echo $k;?>">
+			<span style="color:<?php echo bestColor(@$p['project_color_identifier']); ?>;text-decoration:none;">
+			<strong><?php echo $AppUI->___(@$p['company_name'].' :: ' . 
+								( ( isset( $p['dept_name'] ) and ! empty( $p['dept_name'] ) ) ? $AppUI->___($p['dept_name']) . " :: " : '' ) . 
+								@$p['project_name']);?></strong></span></a>
+		</td>
+		<td width="<?php echo (101 - intval(@$p['project_percent_complete']));?>%"><?php echo (intval(@$p['project_percent_complete']));?>%
+		</td>
+	</tr>
   </table>
   </td>
-  <td colspan="3" align="right" valign="middle">
+  <td colspan="4" align="right" valign="middle">
   <table width="100%" border="0">
   <tr>
 	<td align="right">
