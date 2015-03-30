@@ -187,7 +187,10 @@ class dPacl extends gacl_api {
 			return $this->addLogin($login, $username);
 		}
 		//Check if the details have changed.
-		list ($osec, $val, $oord, $oname, $ohid) = $this->get_object_data($id, 'aro');
+		$oArray = $this->get_object_data($id, 'aro');
+		
+		list ($osec, $val, $oord, $oname, $ohid) = $oArray[0];
+		
 		if ($oname != $username) {
 			$res = $this->edit_object( $id, 'user', $username, $login, 1, 0, 'aro');
 			if (!($res)) {
