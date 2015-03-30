@@ -17,11 +17,12 @@ $df = $AppUI->getPref('SHDATEFORMAT');
 
 $q  = new DBQuery;
 $q->addTable('projects', 'prj');
-$q->addQuery('project_id, project_name, project_start_date, project_status, project_target_budget' 
-			 . ', project_start_date, project_priority, project_department, d.dept_name, contact_first_name, contact_last_name');
+$q->addQuery('prj.project_id, project_name, project_start_date, project_status, project_target_budget' 
+			 . ', project_start_date, project_priority, d.dept_name, contact_first_name, contact_last_name');
 $q->addJoin('users', 'u', 'u.user_id = prj.project_owner');
 $q->addJoin('contacts', 'con', 'u.user_contact = con.contact_id');
-$q->addJoin('departments', 'd', 'd.dept_id=prj.project_department');
+$q->addJoin('project_departments', 'pd', 'pd.project_id=prj.project_id' );
+$q->addJoin('departments', 'd', 'd.dept_id=pd.department_id');
 $q->addWhere('prj.project_company = ' . $company_id);
 
 include_once ($AppUI->getModuleClass('projects'));
@@ -43,11 +44,13 @@ if (!($rows = $q->loadList())) {
 			.$AppUI->_('P').'</a></th>'
 			.'<th><a style="color:white" href="?m=companies&amp;a=view&amp;company_id='.$company_id.'&amp;sort=project_name">'
 			.$AppUI->_('Name').'</a></th>'
+		.'<th>'.$AppUI->_('Department.').'</th>'			
 		.'<th>'.$AppUI->_('Owner').'</th>'
 		.'<th>'.$AppUI->_('Started').'</th>'
 		.'<th>'.$AppUI->_('Status').'</th>'
 		.'<th>'.$AppUI->_('Budget').'</th>'
 		.'</tr>';
+
 	foreach ($rows as $row) {
 		$start_date = new CDate($row['project_start_date']);
 		$s .= '<tr><td>';
@@ -59,13 +62,15 @@ if (!($rows = $q->loadList())) {
 		
 		$s .= '</td>';
 		$s .= '<td width="100%">';
-		if ( $row['dept_name'] > 0 )
+		if ( $row['dept_name'] > '')
 		   $projectD = $row['dept_name'];
-                else
-                   $projectD = '';
+        else
+           $projectD = '';
 
 		$s .= ('<a href="?m=projects&amp;a=view&amp;project_id=' . dPformSafe($row['project_id']) . '">' 
-		       . htmlspecialchars($row['project_name']) . '</a>( ' . $projectD . ' )</td>');
+		       . htmlspecialchars($row['project_name']) . '</a></td>');
+
+		$s .= '<td nowrap="nowrap">' . $projectD . '</td>';       
 		$s .= ('<td nowrap="nowrap">' . htmlspecialchars($row['contact_first_name']) . '&nbsp;' 
 		       . htmlspecialchars($row['contact_last_name']) . '</td>');
 		$s .= '<td nowrap="nowrap">' . $start_date->format($df) . '</td>';
