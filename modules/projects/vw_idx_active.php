@@ -51,6 +51,12 @@ if ($added_cols) {
 		</a>
 	</th>
 	<th nowrap="nowrap">
+		<a href="?m=projects&amp;orderby=dept_name" class="hdr">
+		<?php echo $AppUI->_('Dept. Name');?>
+		</a>
+	</th>	
+	
+	<th nowrap="nowrap">
 		<a href="?m=projects&amp;orderby=project_start_date" class="hdr">
 		<?php echo $AppUI->_('Start');?>
 		</a>
@@ -147,6 +153,10 @@ echo($AppUI->_('Description')); ?>', CENTER);" onmouseout="nd();"<?php } ?>>
 		<?php echo (htmlspecialchars($row['project_name'], ENT_QUOTES)); ?>
 		</a>
 	</td>
+	<td align="center">
+		<?php //echo 'dept';
+		echo htmlspecialchars($row['dept_name']); ?>
+	</td>	
 	<td align="center">
 		<?php echo (htmlspecialchars($start_date ? $start_date->format($df) : '-')); ?>
 	</td>

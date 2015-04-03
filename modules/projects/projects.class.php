@@ -383,7 +383,7 @@ class CProject extends CDpObject {
     {
 
         $q = new DBQuery;
-        var_dump($q);
+//        var_dump($q);
         $q->addTable('projects', 'pr');
         $q->addQuery('pr.project_id, project_color_identifier, project_name, project_start_date, project_end_date, project_company');
         if ($activeOnly) {
@@ -624,9 +624,8 @@ function projects_list_data($user_id=false) {
 		$q->addTable('departments');
 		$q->addQuery('dept_id, dept_parent');
 		$q->addOrder('dept_parent,dept_name');
-		$rows = $q->loadHashList();
-		addDeptId($rows, $department);
-		$dept_ids[] = $department;
+		$rows = $q->loadList();
+		
 	}
 	$q->clear();
 
@@ -653,26 +652,23 @@ function projects_list_data($user_id=false) {
 		$q->addWhere('p.project_status = '.$project_status);
 	}
 
+	// Join the departments table
+	$q->addJoin('project_departments', 'pd', 'pd.project_id = p.project_id');
+	$q->addJoin( 'departments', 'd', 'd.dept_id=pd.department_id');
+	$q->addQuery( 'd.dept_name' );
+
 	if (isset($department)) {
-		
-		$q->addJoin('project_departments', 'pd', 'pd.project_id = p.project_id');
 
 		if (!$addPwOiD) {
-			$q->addWhere('pd.department_id in (' . implode(',',$dept_ids) . ')');
+			//	addDeptId($rows, $department);
+			//	$dept_ids[] = $department;
+			//	$q->addWhere('pd.department_id in (' . implode(',',$dept_ids) . ')');
+			$q->addWhere('pd.department_id = ' . $department );
 		} else {
 			// Show Projects where the Project Owner is in the given department
 			$q->addWhere('p.project_owner IN ('
 			             . ((!empty($owner_ids)) ? implode(',', $owner_ids) : 0) . ')');
 		}
-		
-	} else 
-	{
-		// Join the departments table
-		$q->addJoin('project_departments', 'pd', 'pd.project_id = p.project_id');
-
-		$q->addJoin( 'departments', 'd', 'd.dept_id=pd.department_id');
-		$q->addQuery( 'd.dept_name' );
-	
 		
 	}
 		
@@ -700,8 +696,6 @@ function projects_list_data($user_id=false) {
 	
 	$projects = $q->loadList();
 
-
-
 	// retrieve list of records
 	// modified for speed
 	// by Pablo Roca (pabloroca@mvps.org)
@@ -726,6 +720,7 @@ function projects_list_data($user_id=false) {
 	$q->addWhere('p.project_status NOT IN (1, 4, 5, 6, 7)');
 	$q->addOrder('c.company_name, dep.dept_parent, dep.dept_name');
 	$obj_company->setAllowedSQL($AppUI->user_id, $q);
+	
 	$active_companies = $q->loadList();
 
 	$q->clear();
@@ -748,28 +743,30 @@ function projects_list_data($user_id=false) {
 	// Active companies first
 	$cBuffer .= '<optgroup label="Active">';
 	foreach ($active_companies as $row) {
-		if ($row['dept_parent'] == 0) {
-			if ($company != $row['company_id']) {
-				$cBuffer .= ('<option value="' . $AppUI->___($company_prefix . $row['company_id'])
-				             . '" style="font-weight:bold;"'
-				             . (($company_id == $row['company_id']) ? 'selected="selected"' : '')
-				             . '>' . $AppUI->___($row['company_name']) . '</option>' . "\n");
-				$company = $row['company_id'];
-				$active_company_ids[] = $company;
-			}
 
-			if ($row['dept_parent'] != null) {
-				showchilddept($row);
-				findchilddept($rows, $row['dept_id']);
-			}
+		if ($company != $row['company_id']) {
+			$cBuffer .= ('<option value="' . $AppUI->___($company_prefix . $row['company_id'])
+			             . '" style="font-weight:bold;"'
+			             . (($company_id == $row['company_id']) ? 'selected="selected"' : '')
+			             . '>' . $AppUI->___($row['company_name']) . '</option>' . "\n");
+			$company = $row['company_id'];
+			$active_company_ids[] = $company;
 		}
+
+		if ($row['dept_parent'] == 0) {
+			showchilddept($row);
+			findchilddept($active_companies, $row['dept_id']);
+		}
+	
 	}
+
 	$cBuffer .= '</optgroup>';
 
 	// Inactive companies
 	$cBuffer .= '<optgroup label="Inactive">';
 	foreach ($all_companies as $row) {
-		if ($row['dept_parent'] == 0 and !in_array($row['company_id'], $active_company_ids)) {
+
+		if ((int)$row['dept_parent'] == 0 and !in_array($row['company_id'], $active_company_ids)) {
 			if ($company != $row['company_id']) {
 				$cBuffer .= ('<option value="' . $AppUI->___($company_prefix . $row['company_id'])
 				             . '" style="font-weight:bold;"'
@@ -780,7 +777,7 @@ function projects_list_data($user_id=false) {
 
 			if ($row['dept_parent'] != null) {
 				showchilddept($row);
-				findchilddept($rows, $row['dept_id']);
+				findchilddept($all_companies, $row['dept_id']);
 			}
 		}
 	}

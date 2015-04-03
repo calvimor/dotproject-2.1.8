@@ -43,6 +43,7 @@ function showchilddept_comp(&$a, $level=0) {
 function findchilddept_comp(&$tarr, $parent, $level=0) {
 	$level = $level+1;
 	$n = count($tarr);
+	
 	for ($x=0; $x < $n; $x++) {
 		if ($tarr[$x]['dept_parent'] == $parent 
 		    && $tarr[$x]['dept_parent'] != $tarr[$x]['dept_id']) {
@@ -55,6 +56,7 @@ function findchilddept_comp(&$tarr, $parent, $level=0) {
 
 $s = '<table width="100%" border="0" cellpadding="2" cellspacing="1" class="tbl" summary="view departments">';
 $s .= '<tr>';
+
 $rows = db_loadList($sql, NULL);
 if (count($rows)) {
 	$s .= '<th>&nbsp;</th>';

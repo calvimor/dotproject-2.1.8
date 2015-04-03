@@ -111,35 +111,36 @@ class CDepartment extends CDpObject {
 }
 
 //writes out a single <option> element for display of departments
-function showchilddept(&$a, $level=1) {
+function showchilddept( &$a, $level=0 ) {
 	global $AppUI, $cBuffer, $department;
-	$s = ('<option value="' . $AppUI->___($a['dept_id']) . '"' 
+	$s = ('<option value="' . $a['dept_id'] . '"' 
 	      . ((isset($department) && $department == $a['dept_id']) ? 'selected="selected"' : '') 
 	      . '>');
-
+	      
 	for ($y=0; $y < $level; $y++) {
-		$s .= (($y+1 == $level) ? '' : '&nbsp;&nbsp;');
+		$s .= (($y+1 == $level) ? '&nbsp;&nbsp;' : '' );
 	}
 	
 	$s .= '&nbsp;&nbsp;' . $AppUI->___($a['dept_name']) . "</option>\n";
 	$cBuffer .= $s;
 
-//	echo $s;
 }
 
 //recursive function to display children departments.
-function findchilddept(&$tarr, $parent, $level=1) {
+function findchilddept(&$tarr, $parent, $level=0) {
 	$level = $level+1;
 	$n = count($tarr);
 	for ($x=0; $x < $n; $x++) {
 		if ($tarr[$x]['dept_parent'] == $parent 
 		    && $tarr[$x]['dept_parent'] != $tarr[$x]['dept_id']) {
+				
 			showchilddept($tarr[$x], $level);
 			findchilddept($tarr, $tarr[$x]['dept_id'], $level);
 		}
 	}
 }
 
+/* Receiving a hash list - UNUSED FUNCTION */
 function addDeptId($dataset, $parent) {
 	global $dept_ids;
 	foreach ($dataset as $data) {
