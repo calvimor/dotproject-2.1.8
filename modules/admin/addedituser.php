@@ -147,6 +147,9 @@ function setDept(key, val) {
 
 <table width="100%" border="0" cellpadding="0" cellspacing="1" height="400" class="std">
 <form name="editFrm" action="./index.php?m=admin" method="post">
+	
+	<input type="hidden" name="m" value="admin" />
+	<input type="hidden" name="a" value="viewuser" />
 	<input type="hidden" name="user_id" value="<?php echo intval($user['user_id']);?>" />
 	<input type="hidden" name="contact_id" value="<?php echo intval($user['contact_id']);?>" />
 	<input type="hidden" name="dosql" value="do_user_aed" />
