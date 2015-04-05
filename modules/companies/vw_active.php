@@ -36,7 +36,7 @@ $q->addWhere('prj.project_status <> 7');
 $q->addOrder($sort);
 $s = '';
 
-if (!($rows = $q->loadList())) {
+if (!($projects = $q->loadList())) {
 	$s .= '<tr><td>'.$AppUI->_('No data available').'<br />'.$AppUI->getMsg().'</td></tr>';
 } else {
 	$s .= '<tr>';
@@ -51,7 +51,7 @@ if (!($rows = $q->loadList())) {
 		.'<th>'.$AppUI->_('Budget').'</th>'
 		.'</tr>';
 
-	foreach ($rows as $row) {
+	foreach ($projects as $row) {
 		$start_date = new CDate($row['project_start_date']);
 		$s .= '<tr><td>';
 		if ($row['project_priority'] < 0) {
