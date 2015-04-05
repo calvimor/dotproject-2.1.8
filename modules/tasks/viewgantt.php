@@ -12,11 +12,10 @@ $min_view = defVal(@$min_view, false);
 $project_id = defVal(@$_GET['project_id'], 0);
 
 // sdate and edate passed as unix time stamps
+if ( preg_match( "/POST/", $_SERVER['REQUEST_METHOD'] ) ){
 
-if ( preg_match( "/POST/", $_SERVER['REQUEST_METHOD'] ) and isset( $_POST['printpdfhr'] ) and $_POST['printpdfhr'] == '1' ){
-
-	$sdate = dPgetCleanParam($_POST, 'start_date', 0);
-	$edate = dPgetCleanParam($_POST, 'end_date', 0);
+	$sdate = dPgetCleanParam($_POST, 'sdate', 0);
+	$edate = dPgetCleanParam($_POST, 'edate', 0);
 
 	$display_option = dPgetCleanParam($_POST, 'display_option', 'this_month');
 
@@ -24,16 +23,24 @@ if ( preg_match( "/POST/", $_SERVER['REQUEST_METHOD'] ) and isset( $_POST['print
 	$showLabels = (int)dPgetParam($_POST, 'showLabels', '0');
 	$showWork = (int)dPgetParam($_POST, 'showWork', '0');
 	$sortByName = (int)dPgetParam($_POST, 'sortByName', '0');
-	$printpdf = dPgetParam($_POST, 'printpdf', '0');
-	$printpdfhr = dPgetParam($_POST, 'printpdfhr', '0');
 
 	$showLabels = (($showLabels != '0') ? '1' : $showLabels);
 	$showWork = (($showWork != '0') ? '1' : $showWork);
 	$sortByName = (($sortByName != '0') ? '1' : $sortByName);
-	$printpdf = (($printpdf != '0') ? '1' : $printpdf);
-	$printpdfhr = (($printpdfhr != '0') ? '1' : $printpdfhr);
 
+	if ( isset( $_POST['printpdfhr'] ) and $_POST['printpdfhr'] == '1' ){
+		$printpdf = dPgetParam($_POST, 'printpdf', '0');
+		$printpdfhr = dPgetParam($_POST, 'printpdfhr', '0');
+		$printpdf = (($printpdf != '0') ? '1' : $printpdf);
+		$printpdfhr = (($printpdfhr != '0') ? '1' : $printpdfhr);
+	} else{
+		$printpdf = '0';
+		$printpdfhr = '0';
+	}	
+	
 }
+
+
 
 if ($a == 'todo') {
 	if (isset($_POST['show_form'])) {
@@ -195,6 +202,15 @@ echo $end_date->format($df);?>" size="12" disabled="disabled" />
 		<a href="javascript:popCalendar('edate')">
 		<img src="./images/calendar.gif" width="24" height="12" alt="" border="0" />
 		</a>
+	</td>
+	<td align="right" valign="top" width="20">
+<?php if ($display_option != "all") { ?>
+	  <a href="javascript:scrollNext()">
+	  	<img src="./images/next.gif" width="16" height="16" alt="<?php 
+echo $AppUI->_('next');?>" border="0" />
+	  </a>
+<?php } ?>
+	</td>		
 	<td valign="top">
 		<input type="checkbox" name="showLabels" id="showLabels" <?php 
 echo (($showLabels == 1) ? 'checked="checked"' : ''); ?> /><label for="showLabels"><?php 
@@ -217,14 +233,6 @@ echo $AppUI->_('submit');?>" onclick='javascript:document.editFrm.display_option
 echo $AppUI->_('Print to PDF');?>" onclick='javascript:printPDFHR()' style="float: right;" />
 	</td>
 
-	<td align="right" valign="top" width="20">
-<?php if ($display_option != "all") { ?>
-	  <a href="javascript:scrollNext()">
-	  	<img src="./images/next.gif" width="16" height="16" alt="<?php 
-echo $AppUI->_('next');?>" border="0" />
-	  </a>
-<?php } ?>
-	</td>
 </tr>
 <?php if ($a == 'todo') { ?>
 <tr>
