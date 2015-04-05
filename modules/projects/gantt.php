@@ -3,7 +3,7 @@ if (!defined('DP_BASE_DIR')) {
 	die('You should not access this file directly.');
 }
 
-global $AppUI, $m, $a, $company_id, $dept_ids, $department, $locale_char_set;
+global $AppUI, $m, $a, $company_id, $locale_char_set;
 global $proFilter, $projectStatus, $showInactive, $showLabels, $showAllGantt;
 global $sortTasksByName, $user_id, $dPconfig, $m_orig, $a_orig;
 
@@ -26,6 +26,7 @@ $addPwOiD = (int)dPgetParam($_REQUEST, 'addPwOiD', 0);
 $m_orig = dPgetCleanParam($_REQUEST, 'm_orig', $m);
 $a_orig = dPgetCleanParam($_REQUEST, 'a_orig', $a);
 $taskPin = dPgetCleanParam($_REQUEST, 'taskPin', $a); 
+$showWorker = dPgetCleanParam($_REQUEST, 'showWorker', $a );
 
 $projectStatus = dPgetSysVal('ProjectStatus');
 $projectStatus = arrayMerge(array('-2' => $AppUI->_('All w/o in progress'), 
@@ -57,19 +58,22 @@ if ($addPwOiD && $department > 0) {
 // GJB: Note that we have to special case duration type 24 and this refers to the hours in a day, NOT 24 hours
 $q->addTable('projects', 'p');
 $q->addQuery('DISTINCT p.project_id, project_color_identifier, project_name, project_start_date' 
-             . ', project_end_date, max(t1.task_end_date) AS project_actual_end_date' 
+             . ', project_end_date, max(t1.task_end_date) AS project_actual_end_date, d.dept_name' 
              . ', SUM(task_duration * task_percent_complete * IF(task_duration_type = 24, ' 
              . $working_hours . ', task_duration_type))' 
              . ' / SUM(task_duration * IF(task_duration_type = 24, ' 
              . $working_hours . ', task_duration_type)) AS project_percent_complete' 
              . ', project_status');
 $q->addJoin('tasks', 't1', 'p.project_id = t1.task_project');
-$q->addJoin('user_task_pin','tp','t1.task_id = tp.task_id' );
+
 $q->addJoin('companies', 'c1', 'p.project_company = c1.company_id');
 
+$q->addJoin('project_departments', 'pd', 'pd.project_id = p.project_id');
+$q->addJoin( 'departments', 'd', 'd.dept_id=pd.department_id');
+$q->addQuery( 'd.dept_name' );
+
 if ($department > 0) {
-	$q->addJoin('project_departments', 'pd', 'pd.project_id = p.project_id');
-	
+		
 	if (!$addPwOiD) {
 		$q->addWhere('pd.department_id = ' . $department);
 	} else {
@@ -96,6 +100,7 @@ if ($user_id && $m_orig == 'admin' && $a_orig == 'viewuser') {
 }
 
 if ($taskPin == '1') {
+	$q->addJoin('user_task_pin','tp','tp.task_id=t1.task_id' );
 	$q->addWhere('tp.task_pinned = 1');
 }
 
@@ -105,6 +110,9 @@ if ($showInactive != '1') {
 $pjobj->setAllowedSQL($AppUI->user_id, $q, null, 'p');
 $q->addGroup('p.project_id');
 $q->addOrder('project_name, task_end_date DESC');
+
+$sql = $q->prepare() . "\n";
+file_put_contents( 'files/temp/debug', $sql, FILE_APPEND );
 
 $projects = $q->loadList();
 $q->clear();
@@ -167,11 +175,18 @@ if ($start_date && $end_date) {
 	$min_d_start = new CDate($start_date);
 	$max_d_end = new CDate($end_date);
 	$graph->SetDateRange($start_date, $end_date);
+	$msg = "Date set to\n";
+	// $min_d_start, $max_d_end\n";
+	file_put_contents( 'files/temp/debug', $msg, FILE_APPEND );
 } else {
 	// find out DateRange from gant_arr
+	file_put_contents( 'files/temp/debug', "Date not set\n", FILE_APPEND );
+
 	$d_start = new CDate();
 	$d_end = new CDate();
 	for ($i = 0, $xi = count(@$projects); $i < $xi; $i++) {
+		
+		/* Q. Where does $p come from > */
 		$start = mb_substr($p['project_start_date'], 0, 10);
 		$end = mb_substr($p['project_end_date'], 0, 10);
 		
@@ -304,6 +319,7 @@ if (is_array($projects)) {
 			             . ', t.task_milestone, t.task_dynamic');
 			$q->addJoin('projects', 'p', 'p.project_id = t.task_project');
 			$q->addWhere('p.project_id = '. $p['project_id']);
+			$q->addWhere('t.task_status <> -1');
 			$q->addOrder((($sortTasksByName) ? 't.task_name' : 't.task_end_date ASC'));
 			$tasks = $q->loadList();
 			$q->clear();
@@ -340,7 +356,7 @@ if (is_array($projects)) {
 					$graph->Add($bar2);
 				}				
  				
-				//Insert workers for each task into Gantt Chart 
+				//Insert workers for each task into Gantt Chart 				
 				$q->addTable('user_tasks', 't');
 				$q->addQuery('DISTINCT user_username, t.task_id');
 				$q->addJoin('users', 'u', 'u.user_id = t.user_id');
@@ -349,19 +365,23 @@ if (is_array($projects)) {
 				$workers = $q->loadList();
 				$q->clear();
 				$workersName = '';
-				foreach ($workers as $w) {	
-					$workersName .= (' ' . $w['user_username']);
+				
+				if ( $showWorker ){
+				
+					foreach ($workers as $w) {	
+						$workersName .= (' ' . $w['user_username']);
 					
-					$bar3 = new GanttBar($row++, 
-					                     array(('   * ' . $w['user_username']), ' ', ' ',' '), 
-					                     $tStartObj->format(FMT_DATETIME_MYSQL), 
-					                     $tEndObj->format(FMT_DATETIME_MYSQL), 0.6);
-					$bar3->title->SetFont(FF_CUSTOM, FS_NORMAL, 9);
-					$bar3->title->SetColor(bestColor('#ffffff', 
-					                                 ('#' . $p['project_color_identifier']), 
-					                                 '#000000'));
-					$bar3->SetFillColor('#' . $p['project_color_identifier']);		
-					$graph->Add($bar3);
+						$bar3 = new GanttBar($row++, 
+											array(('   * ' . $w['user_username']), ' ', ' ',' '), 
+											$tStartObj->format(FMT_DATETIME_MYSQL), 
+											$tEndObj->format(FMT_DATETIME_MYSQL), 0.6);
+						$bar3->title->SetFont(FF_CUSTOM, FS_NORMAL, 9);
+						$bar3->title->SetColor(bestColor('#ffffff', 
+														('#' . $p['project_color_identifier']), 
+														'#000000'));
+						$bar3->SetFillColor('#' . $p['project_color_identifier']);		
+						$graph->Add($bar3);
+					}	
 				}
 				//End of insert workers for each task into Gantt Chart
 			}
