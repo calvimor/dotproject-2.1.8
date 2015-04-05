@@ -11,7 +11,7 @@
  * Note: This file comes from web2project to enable the creation of Gantt Pdfs
  * 
  */
-error_reporting(-1);
+//error_reporting(-1);
 require_once DP_BASE_DIR . '/lib/jpgraph/src/jpgraph.php';
 
 require_once DP_BASE_DIR . '/lib/jpgraph/src/jpgraph_gantt.php';
