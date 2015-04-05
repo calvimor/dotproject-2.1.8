@@ -228,6 +228,10 @@ function delIt() {
 			<td class="hilite" width="300"><?php if ($obj->task_milestone) {echo $AppUI->_('Yes');}else {echo $AppUI->_('No');}?></td>
 		</tr>
 		<tr>
+			<td align="right" nowrap="nowrap"><?php echo $AppUI->_('Status');?>:</td>
+			<td class="hilite" width="300"><strong><?php echo ( $obj->task_status == -1 ? "Inactive" : "Active" );?></strong></td>
+		</tr>
+		<tr>
 			<td align="right" nowrap="nowrap"><?php echo $AppUI->_('Progress');?>:</td>
 			<td class="hilite" width="300"><?php echo @$obj->task_percent_complete;?>%</td>
 		</tr>
