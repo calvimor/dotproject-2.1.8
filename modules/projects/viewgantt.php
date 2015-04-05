@@ -17,7 +17,10 @@ $showLabels = (int)dPgetParam($_POST, 'showLabels', '0');
 $sortTasksByName = (int)dPgetParam($_POST, 'sortTasksByName', '0');
 $showAllGantt = (int)dPgetParam($_POST, 'showAllGantt', '0');
 $showTaskGantt = (int)dPgetParam($_POST, 'showTaskGantt', '0');
+$taskPin = (int)dPgetParam($_POST, 'taskPin', '0');
 $addPwOiD = (int)dPgetParam($_POST, 'add_pwoid', isset($addPwOiD) ? $addPwOiD : 0);
+$showWorker = (int)dPgetParam($_POST, 'showWorker', '0');
+
 $m_orig = $m;
 $a_orig = $a;
 
@@ -181,6 +184,16 @@ echo $end_date->format($df);?>" size="12" disabled="disabled" />
 				<img src="./images/calendar.gif" width="24" height="12" alt="" border="0" />
 				</a>
 			</td>
+
+			<td align="right" valign="top" width="20">
+<?php if ($display_option != "all") { ?>
+			<a href="javascript:scrollNext()">
+				<img src="./images/next.gif" width="16" height="16" alt="<?php 
+echo $AppUI->_('next');?>" border="0" />
+			</a>
+<?php } ?>
+			</td>
+						
 			<td valign="top">
 				<?php 
 echo arraySelect($projFilter, 'proFilter', 'size="1" class="text"', $proFilter, true);?>
@@ -193,7 +206,7 @@ echo $AppUI->_('Show captions');?></label>
 			<td valign="top">
 				<input type="checkbox" value='1' name="showInactive" id="showInactive" <?php 
 echo (($showInactive==1) ? 'checked="checked"' : "");?> /><label for="showInactive"><?php 
-echo $AppUI->_('Show Archived');?></label>
+echo $AppUI->_('Archived');?></label>
 			</td>
 
 			<td valign="top">
@@ -212,18 +225,17 @@ echo $AppUI->_('Show Pinned');?></label>
 echo (($sortTasksByName==1) ? 'checked="checked"' : "");?> /><label for="sortTasksByName"><?php 
 echo $AppUI->_('Sort Tasks By Name');?></label>
 			</td>
+			<td valign="top">
+				<input type="checkbox" value='1' name="showWorker" id="showWorker" <?php 
+echo (($showWorker==1) ? 'checked="checked"' : "");?> /><label for="showWorker"><?php 
+echo $AppUI->_('Show Worker(s)');?></label>
+			</td>
+
 			<td align="left">
 				<input type="button" class="button" value="<?php 
 echo $AppUI->_('submit');?>" onclick='document.editFrm.display_option.value="custom";submit();' />
 			</td>
-			<td align="right" valign="top" width="20">
-<?php if ($display_option != "all") { ?>
-			<a href="javascript:scrollNext()">
-				<img src="./images/next.gif" width="16" height="16" alt="<?php 
-echo $AppUI->_('next');?>" border="0" />
-			</a>
-<?php } ?>
-			</td>
+
 		</tr>
 		<tr>
 			<td align="center" valign="bottom" colspan="12">
@@ -240,14 +252,15 @@ echo ("<a href='javascript:showThisMonth()'>" . $AppUI->_('show this month')
 		<tr>
 			<td>
 				<?php
+				
 $src = ("?m=projects&amp;a=gantt&amp;suppressHeaders=1" . 
 	(($display_option == 'all') ? '' 
          : ('&amp;start_date=' . $start_date->format("%Y-%m-%d") 
            . '&amp;end_date=' . $end_date->format("%Y-%m-%d"))) . "&amp;width='" 
 		. "+((navigator.appName=='Netscape'?window.innerWidth:document.body.offsetWidth)*0.95)" 
-		. "+'&amp;showLabels=" . $showLabels . '&amp;sortTasksByName=' .$sortTasksByName 
+		. "+'&amp;showLabels=" . $showLabels . '&amp;sortTasksByName=' .$sortTasksByName . '&amp;showWorker=' .$showWorker 
 		. '&amp;proFilter=' .$proFilter . '&amp;showInactive=' . $showInactive 
-		. '&amp;company_id=' . $company_id . '&amp;department=' . $department . '&amp;dept_ids=' . $dept_ids 
+		. '&amp;company_id=' . $company_id . '&amp;department=' . $department . '&amp;taskPin=' . $taskPin  
 		. '&amp;showAllGantt=' . $showAllGantt . '&amp;user_id=' . $user_id . '&amp;addPwOiD=' . $addPwOiD 
 		. '&amp;m_orig=' . $m_orig . '&amp;a_orig=' . $a_orig);
 echo '<script>document.write(\'<img src="' . $src . '">\')</script>';
