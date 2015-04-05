@@ -886,6 +886,9 @@ class dPacl extends gacl_api {
    * 
    */
   function regeneratePermissions() {
+	  
+     $q = new DBQuery;
+
       $dbprefix = dPgetConfig('dbprefix','');
       $query2[]="TRUNCATE TABLE {$dbprefix}dotpermissions";
 
@@ -941,7 +944,10 @@ class dPacl extends gacl_api {
 	   WHERE axo_g.value IS NOT NULL and aro.value IS NOT NULL";
 
       foreach ($query2 as $query) {
-          mysql_query($query);
+		  
+			$q->addQuery( $query );
+			$q->exec();
+//          mysql_query($query);
       }
   }
 
