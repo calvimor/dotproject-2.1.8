@@ -161,19 +161,18 @@ echo $uistyle;?>/images/dp_icon.gif" border="0" /></a></th>
 			<td nowrap="nowrap">
 				<?php echo dPcontextHelp('Help'); ?> | 
 				<a href="./index.php?m=admin&amp;a=viewuser&amp;user_id=<?php 
-echo $AppUI->user_id; ?>"><?php echo $AppUI->_('My Info');?></a> | <?php
-	if (getPermission('tasks', 'access')) {
-?>
-				<a href="./index.php?m=tasks&amp;a=todo"><b><?php echo $AppUI->_('Todo'); 
-?></b></a> | <?php
-	}
-	if (getPermission('calendar', 'access')) {
-		$now = new CDate();
-?>
+echo $AppUI->user_id; ?>"><?php echo $AppUI->_('My Info');?></a> |
+				<?php if (getPermission('tasks', 'access')) {?>
+				<a href="./index.php?m=tasks&amp;a=todo"><b><?php 
+								echo $AppUI->_('Todo'); ?></b></a> |
+				<?php }	
+				if (getPermission('calendar', 'access')) { 
+					$now = new CDate(); ?>
 				<a href="./index.php?m=calendar&amp;a=day_view&amp;date=<?php 
-echo $now->format(FMT_TIMESTAMP_DATE);?>"><?php echo $AppUI->_('Today');?></a> | <?php 
-	}
-?>
+echo $now->format(FMT_TIMESTAMP_DATE);?>"><?php echo $AppUI->_('Today');?></a> |
+				<?php }	?>
+				<a href="./index.php?m=projects&amp;a=reports"><?php 
+								echo $AppUI->_('Reports'); ?></a> |
 				<a href="./index.php?logout=-1"><?php echo $AppUI->_('Logout');?></a>
 			</td>
 		</tr>
