@@ -1,11 +1,19 @@
 
 Update 2.1.8 mid-march 2015
 
-	-	Integrated code from Web2project to generate Gantt Charts in Pdf format 
+	-	Enhanced the filtering of projects, tasks and Gantt charts per company and departments.
+	    Started to clean up the project code, removal of hard coded values applying used to apply project filters.
+	    In particular, project status should absolutely not be touched from the system admin panels as there are hard coded values that 
+	    are used in project filtering.
+   
+	-	Integrated/adapted code from Web2project to generate Pdf Gantt Charts when viewing Tasks ( thank you Mr. Casey for saving us some time )
 	-	Project and Task listings now show the departments attached to them
-		Note: projects and tasks can be assigned to departments of a given company independently
+		Note: projects and tasks can be assigned to departments of a given company independently - We do not forsee using this
+		thus will not provide code for that scenario. As we keep going back to code reviewing this package, we will adjust the code so that 
+		tasks get filtered on their project's department.
 	-	Removed TicketSmith code and database tables
 	-	Installed the Helpdesk from linuxbox.com - revision of modules/helpdesk/config.php is mandatory:
+			
 			set 'the_company' to your company Id - click on the company top menu item and hoover the mouse over the link of your company
 			the Url will show at the bottom of the screen. Take note of the 'company_id' value and set it in your config.php file
 			
@@ -21,7 +29,8 @@ Update 2.1.8 mid-march 2015
 	-	Important note: This version of Dotproject is extensively used with the Grey Slimline Style - Others are giving problems 
 				with javascript code rendering the software not so useful. Such is the case with Tasks' dates.
 						
-	  
+	-	Removed database upgrade functionality. Supporting only new installs.
+		
 Version 2.1.8 mid-november 2014
 
 	-	AdoDB upgraded to 5.19, 
