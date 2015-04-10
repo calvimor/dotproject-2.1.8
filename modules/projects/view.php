@@ -200,6 +200,9 @@ if ($canEdit) {
 	}
 	$titleBlock->addCrumb('?m=tasks&amp;a=organize&amp;project_id=' . $project_id, 'organize tasks');
 }
+if ( $AppUI->getModuleClass( 'projectdesigner' ) )
+	$titleBlock->addCrumb('?m=projectdesigner&amp;project_id=' . $project_id, 'Project Designer');
+	
 $titleBlock->addCrumb('?m=projects&amp;a=reports&amp;project_id=' . $project_id, 'reports');
 $titleBlock->show();
 ?>

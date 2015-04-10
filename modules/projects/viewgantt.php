@@ -12,8 +12,8 @@ $user_id = intval(dPgetParam($_GET, 'user_id', $AppUI->user_id));
 // sdate and edate passed as unix time stamps
 $sdate = dPgetCleanParam($_POST, 'sdate', 0);
 $edate = dPgetCleanParam($_POST, 'edate', 0);
-$showInactive = (int)dPgetParam($_POST, 'showInactive', '0');
-$showLabels = (int)dPgetParam($_POST, 'showLabels', '0');
+$showArchived = (int)dPgetParam($_POST, 'showArchived', '0');
+$showCaption = (int)dPgetParam($_POST, 'showCaption', '0');
 $sortTasksByName = (int)dPgetParam($_POST, 'sortTasksByName', '0');
 $showAllGantt = (int)dPgetParam($_POST, 'showAllGantt', '0');
 $showTaskGantt = (int)dPgetParam($_POST, 'showTaskGantt', '0');
@@ -25,16 +25,17 @@ $m_orig = $m;
 $a_orig = $a;
 
 //if set GantChart includes user labels as captions of every GantBar
-if ($showLabels!='0') {
-	$showLabels='1';
+if ($showCaption!='0') {
+	$showCaption='1';
 }
-if ($showInactive!='0') {
-	$showInactive='1';
+if ($showArchived!='0') {
+	$showArchived='1';
 }
 
 if ($showAllGantt!='0') {
 	$showAllGantt='1';
 }
+
 
 if (isset($_POST['proFilter'])) {
 	$AppUI->setState('ProjectIdxFilter',  $_POST['proFilter']);
@@ -42,21 +43,44 @@ if (isset($_POST['proFilter'])) {
 $proFilter = (($AppUI->getState('ProjectIdxFilter') !== NULL) 
               ? $AppUI->getState('ProjectIdxFilter') : '-1');
 
-
 $projectStatus = dPgetSysVal('ProjectStatus');
-$projFilter = arrayMerge(array('-1' => 'All Projects', '-2' => 'All w/o in progress', 
-                               '-3' => (($AppUI->user_id == $user_id) ? 'My projects' 
+
+$projFilter = arrayMerge(array(	'-1' => 'All Projects', 
+								'-2' => 'All w/o in progress', 
+								'-3' => (($AppUI->user_id == $user_id) ? 'My projects' 
                                         : "User's projects")), $projectStatus);
 if (!(empty($projFilter_extra))) {
 	$projFilter = arrayMerge($projFilter, $projFilter_extra);
 }
 natsort($projFilter);
 
-
 // months to scroll
 $scroll_date = 1;
 
 $display_option = dPgetCleanParam($_POST, 'display_option', 'this_month');
+
+$showPriority = dPgetParam($_POST, 'showPriority', '0');
+$showType = dPgetParam($_POST, 'showType', '0');
+	
+$showTaskPriority = dPgetParam($_POST, 'showTaskPriority', '0');
+$showTaskType = dPgetParam($_POST, 'showTaskType', '0');
+$showTaskStatus = dPgetParam($_POST, 'showTaskStatus', '0');
+
+$priority = dPgetsysval('ProjectPriority');
+$spriority = array(''=>'(Project Priorities)') + $priority;
+
+$type = dPgetsysval('ProjectType');
+$stype = array(''=>'(Project Types)') + $type;
+
+$taskpriority = dPgetsysval('TaskPriority');
+$staskpriority = array(''=>'(Task Priorities)') + $taskpriority;
+
+$tasktype = dPgetsysval('TaskType');
+$stasktype = array(''=>'(Task Types)') + $tasktype;
+
+$taskstatus = dPgetsysval('TaskStatus');
+$staskstatus = array(''=>'(Task Statuses)') + $taskstatus;
+
 
 // format dates
 $df = $AppUI->getPref('SHDATEFORMAT');
@@ -74,6 +98,7 @@ if ($display_option == 'custom') {
 }
 
 // setup the title block
+
 if (!@$min_view) {
 	$titleBlock = new CTitleBlock('Gantt Chart', 'applet3-48.png', $m, "$m.$a");
 	$titleBlock->addCrumb(('?m=' . $m), 'projects list');
@@ -194,56 +219,89 @@ echo $AppUI->_('next');?>" border="0" />
 <?php } ?>
 			</td>
 						
+			<td valign="top"><?php echo $AppUI->_("Project filters"); ?>:
+			</td>
+
 			<td valign="top">
 				<?php 
 echo arraySelect($projFilter, 'proFilter', 'size="1" class="text"', $proFilter, true);?>
 			</td>
 			<td valign="top">
-				<input type="checkbox" name="showLabels" id="showLabels" value='1' <?php 
-echo (($showLabels==1) ? 'checked="checked"' : "");?> /><label for="showLabels"><?php 
+				<input type="checkbox" name="showCaption" id="showCaption" value='1' <?php 
+echo (($showCaption==1) ? 'checked="checked"' : "");?> /><label for="showCaption"><?php 
 echo $AppUI->_('Show captions');?></label>
 			</td>
 			<td valign="top">
-				<input type="checkbox" value='1' name="showInactive" id="showInactive" <?php 
-echo (($showInactive==1) ? 'checked="checked"' : "");?> /><label for="showInactive"><?php 
-echo $AppUI->_('Archived');?></label>
+	<!--			<input type="checkbox" value='1' name="showArchived" id="showArchived" 
+	<?php //echo (($showArchived==1) ? 'checked="checked"' : "");?> /><label for="showArchived">
+	<?php //echo $AppUI->_('Archived');?></label>-->
 			</td>
 
-			<td valign="top">
-				<input type="checkbox" value='1' name="showAllGantt" id="showAllGantt" <?php 
-echo (($showAllGantt==1) ? 'checked="checked"' : "");?> /><label for="showAllGantt"><?php 
-echo $AppUI->_('Show Tasks');?></label>
-			</td>
- <td valign="top">
-                                <input type="checkbox" value='1' name="taskPin" id="taskPin" <?php
-echo (($taskPin==1) ? 'checked="checked"' : "");?> /><label for="taskPin"><?php
-echo $AppUI->_('Show Pinned');?></label>
-                        </td>
+			<td></td>
+			<td valign="top" >
+<?php echo arraySelect( $spriority, 'showPriority', 'style="width:120px" class="text"', $showPriority ); ?></td>
 
-			<td valign="top">
-				<input type="checkbox" value='1' name="sortTasksByName" id="sortTasksByName" <?php 
-echo (($sortTasksByName==1) ? 'checked="checked"' : "");?> /><label for="sortTasksByName"><?php 
-echo $AppUI->_('Sort Tasks By Name');?></label>
-			</td>
-			<td valign="top">
-				<input type="checkbox" value='1' name="showWorker" id="showWorker" <?php 
-echo (($showWorker==1) ? 'checked="checked"' : "");?> /><label for="showWorker"><?php 
-echo $AppUI->_('Show Worker(s)');?></label>
-			</td>
+			<td>
+<?php echo arraySelect( $stype, 'showType', 'style="width:110px" class="text"', $showType ); ?></td>
 
-			<td align="left">
+			<td>
+			</td>
+			
+			<td align="left" rowspan="2">
 				<input type="button" class="button" value="<?php 
 echo $AppUI->_('submit');?>" onclick='document.editFrm.display_option.value="custom";submit();' />
 			</td>
 
 		</tr>
 		<tr>
-			<td align="center" valign="bottom" colspan="12">
+			<td align="center" valign="bottom" colspan="1"></td>
+			<td align="center" valign="bottom" colspan="1">
+				<?php echo $AppUI->_("Display Options"); ?>:
+			</td>	
+			<td align="left" valign="bottom" colspan="1">
 				<?php 
-echo ("<a href='javascript:showThisMonth()'>" . $AppUI->_('show this month') 
+echo ("<a href='javascript:showThisMonth()'>" . $AppUI->_('this month') 
 	. "</a> : <a href='javascript:showFullProject()'>" . $AppUI->_('show all') . "</a><br />"); 
 ?>
 			</td>
+			<td align="center" valign="bottom" colspan="1"></td>
+			<td align="center" valign="bottom" colspan="1"></td>
+			<td align="center" valign="bottom" colspan="1"></td>
+									
+			<td align="center" valign="bottom" colspan="1">
+<?php echo $AppUI->_("Tasks filters"); ?>:
+			</td>			
+			<td valign="top">
+				<input type="checkbox" value='1' name="showAllGantt" id="showAllGantt" <?php 
+echo (($showAllGantt==1) ? 'checked="checked"' : "");?> /><label for="showAllGantt"><?php 
+echo $AppUI->_('Show Tasks');?></label>
+			</td>
+			<td valign="top">
+				<input type="checkbox" value='1' name="taskPin" id="taskPin" <?php
+echo (($taskPin==1) ? 'checked="checked"' : "");?> /><label for="taskPin"><?php
+echo $AppUI->_('Show Pinned');?></label>
+            </td>
+
+			<td valign="top">
+				<input type="checkbox" value='1' name="sortTasksByName" id="sortTasksByName" <?php 
+echo (($sortTasksByName==1) ? 'checked="checked"' : "");?> /><label for="sortTasksByName"><?php 
+echo $AppUI->_('Sort By Name');?></label>
+			</td>
+			<td valign="top" colspan="1">
+				<input type="checkbox" value='1' name="showWorker" id="showWorker" <?php 
+echo (($showWorker==1) ? 'checked="checked"' : "");?> /><label for="showWorker"><?php 
+echo $AppUI->_('Show Worker(s)');?></label>
+			</td>												
+			<td valign="top">
+<?php echo arraySelect( $staskpriority, 'showTaskPriority', 'style="width:120px" class="text"', $showTaskPriority ); ?></td>
+
+			<td>
+<?php echo arraySelect( $stasktype, 'showTaskType', 'style="width:110px" class="text"', $showTaskType ); ?></td>
+
+			<td>
+<?php echo arraySelect( $staskstatus, 'showTaskStatus', 'style="width:100px" class="text"', $showTaskStatus ); ?></td>
+
+			
 		</tr>
 		</table>
 		</form>
@@ -252,16 +310,20 @@ echo ("<a href='javascript:showThisMonth()'>" . $AppUI->_('show this month')
 		<tr>
 			<td>
 				<?php
+				// This code is hard to debug - gantt.php should be turned into a function and return an image. Its query should come also from 
+				// projects_list_data() generated data - what is missing is some stats on the number of records fetched both for projects and tasks
 				
 $src = ("?m=projects&amp;a=gantt&amp;suppressHeaders=1" . 
 	(($display_option == 'all') ? '' 
          : ('&amp;start_date=' . $start_date->format("%Y-%m-%d") 
            . '&amp;end_date=' . $end_date->format("%Y-%m-%d"))) . "&amp;width='" 
 		. "+((navigator.appName=='Netscape'?window.innerWidth:document.body.offsetWidth)*0.95)" 
-		. "+'&amp;showLabels=" . $showLabels . '&amp;sortTasksByName=' .$sortTasksByName . '&amp;showWorker=' .$showWorker 
-		. '&amp;proFilter=' .$proFilter . '&amp;showInactive=' . $showInactive 
+		. "+'&amp;showCaption=" . $showCaption . '&amp;sortTasksByName=' .$sortTasksByName . '&amp;showWorker=' .$showWorker 
+		. '&amp;proFilter=' .$proFilter . '&amp;showArchived=' . $showArchived . '&amp;showPriority=' . $showPriority 
+		. '&amp;showType=' . $showType 
 		. '&amp;company_id=' . $company_id . '&amp;department=' . $department . '&amp;taskPin=' . $taskPin  
-		. '&amp;showAllGantt=' . $showAllGantt . '&amp;user_id=' . $user_id . '&amp;addPwOiD=' . $addPwOiD 
+		. '&amp;showAllGantt=' . $showAllGantt . '&amp;showTaskPriority=' . $showTaskPriority 
+		. '&amp;showTaskType=' . $showTaskType .'&amp;showTaskStatus=' . $showTaskStatus . '&amp;user_id=' . $user_id . '&amp;addPwOiD=' . $addPwOiD 
 		. '&amp;m_orig=' . $m_orig . '&amp;a_orig=' . $a_orig);
 echo '<script>document.write(\'<img src="' . $src . '">\')</script>';
 if (!dPcheckMem(32*1024*1024)) {

@@ -5,7 +5,7 @@ if (!defined('DP_BASE_DIR')) {
 
 GLOBAL $AppUI, $projects, $company_id, $pstatus, $project_types, $currentTabId, $currentTabName;
 GLOBAL $priority;
-
+$AppUI->setMsg(__FILE__);
 $df = $AppUI->getPref('SHDATEFORMAT');
 
 $editProjectsAllowed = getPermission('projects', 'edit');

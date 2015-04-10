@@ -616,29 +616,36 @@ function projects_list_data($user_id=false) {
 
 	if ( isset($department) ){
 		
-		/*
-		 * If a department is specified, we want to display projects from the department
-		 * and all departments under that, so we need to build that list of departments
-		 */
-		$dept_ids = array();
+		//
+		 //* If a department is specified, we want to display projects from the department
+		 //* and all departments under that, so we need to build that list of departments
+		 //
 		$q->addTable('departments');
 		$q->addQuery('dept_id, dept_parent');
 		$q->addOrder('dept_parent,dept_name');
 		$rows = $q->loadList();
 		
+	} else{
+	
+		$q->addTable('project_departments');
+		$q->addQuery('project_id');
+		$q->addOrder('project_id');
+		$project_department = $q->loadColumn();
+	
 	}
+	
 	$q->clear();
 
 	$q->addTable('projects', 'p');
+
 	$q->addQuery('p.project_id, p.project_status, p.project_color_identifier, p.project_type'
 	             . ', p.project_name, p.project_description, p.project_start_date'
 	             . ', p.project_end_date, p.project_color_identifier, p.project_company'
-	             . ', p.project_status, p.project_priority, com.company_name'
-	             . ', com.company_description, tc.critical_task, tc.project_actual_end_date'
+	             . ', p.project_status, p.project_priority, co.company_name'
+	             . ', co.company_description, tc.critical_task, tc.project_actual_end_date'
 	             . ', if (tp.task_log_problem IS NULL, 0, tp.task_log_problem) AS task_log_problem'
 				 . ', tt.total_tasks, tsy.my_tasks, ts.project_percent_complete'
 				 . ', ts.project_duration, u.user_username');
-	$q->addJoin('companies', 'com', 'p.project_company = com.company_id');
 	$q->addJoin('users', 'u', 'p.project_owner = u.user_id');
 	$q->addJoin('tasks_critical', 'tc', 'p.project_id = tc.task_project');
 	$q->addJoin('tasks_problems', 'tp', 'p.project_id = tp.task_project');
@@ -648,29 +655,34 @@ function projects_list_data($user_id=false) {
 	if ($addProjectsWithAssignedTasks) {
 		$q->addJoin('tasks_users', 'tu', 'p.project_id = tu.task_project');
 	}
-	if (isset($project_status) && $currentTabId != 500) {
-		$q->addWhere('p.project_status = '.$project_status);
-	}
 
-	// Join the departments table
-	$q->addJoin('project_departments', 'pd', 'pd.project_id = p.project_id');
-	$q->addJoin( 'departments', 'd', 'd.dept_id=pd.department_id');
-	$q->addQuery( 'd.dept_name' );
+//	if (isset($project_status) && $currentTabId != 500) {
+	//	$q->addWhere('p.project_status = '.$project_status);
+//	}
 
-	if (isset($department)) {
-
+	if (isset($department) and ! empty( $department ) ) {
+	
 		if (!$addPwOiD) {
-			//	addDeptId($rows, $department);
-			//	$dept_ids[] = $department;
-			//	$q->addWhere('pd.department_id in (' . implode(',',$dept_ids) . ')');
-			$q->addWhere('pd.department_id = ' . $department );
+
+			// Join the departments table
+			$q->addJoin('project_departments', 'pd', 'pd.project_id = p.project_id');
+			$q->addJoin( 'departments', 'd', 'd.dept_id=pd.department_id');
+			$q->addQuery( 'd.dept_name' );
+			
+			$dept_ids = addDeptId($rows, $department);
+			$q->addWhere('pd.department_id in (' . implode(',',$dept_ids) . ')');
 		} else {
 			// Show Projects where the Project Owner is in the given department
 			$q->addWhere('p.project_owner IN ('
 			             . ((!empty($owner_ids)) ? implode(',', $owner_ids) : 0) . ')');
 		}
 		
-	}
+	} else{
+	
+		$project_department_list = implode( ',', $project_department );
+		$q->addWhere( "p.project_id not in (" . $project_department_list . ")" );
+		
+	}	
 		
 	if ($company_id &&!$addPwOiD) {
 		$q->addWhere('p.project_company = ' . $company_id);
@@ -692,10 +704,23 @@ function projects_list_data($user_id=false) {
 
 	$q->addGroup('p.project_id');
 	$q->addOrder($orderby . ' ' . $orderdir);
-	$obj_project->setAllowedSQL($AppUI->user_id, $q, null, 'p');
 	
+	/* The next line will set the JOIN for the companies */
+	$obj_project->setAllowedSQL($AppUI->user_id, $q, null, 'p');
+	echo $q->prepare();
 	$projects = $q->loadList();
 
+	$cBuffer = getCompanyFilter( $company_id, $company_prefix );
+	
+	$bufferUser = getUserFilter();
+
+}
+
+function getCompanyFilter( $company_id, $company_prefix="company_" ){
+	
+	global $AppUI, $cBuffer;
+	
+	$q = new DBQuery;
 	// retrieve list of records
 	// modified for speed
 	// by Pablo Roca (pabloroca@mvps.org)
@@ -712,24 +737,25 @@ function projects_list_data($user_id=false) {
 	$companies = arrayMerge(array('0' => $AppUI->_('All')), $companies);
 
 	//get list of all departments, filtered by the list of permitted companies.
-	$q->clear();
-	$q->addTable('companies', 'c');
-	$q->addQuery('distinct c.company_id, c.company_name, dep.*');
-	$q->addJoin('departments', 'dep', 'c.company_id = dep.dept_company');
-	$q->addJoin('projects', 'p', 'p.project_company = c.company_id');
+
+	$q->addTable('companies', 'co');
+	$q->addQuery('distinct co.company_id, co.company_name, dep.*');
+	$q->addJoin('departments', 'dep', 'co.company_id = dep.dept_company');
+	$q->addJoin('projects', 'p', 'p.project_company = co.company_id');
 	$q->addWhere('p.project_status NOT IN (1, 4, 5, 6, 7)');
-	$q->addOrder('c.company_name, dep.dept_parent, dep.dept_name');
+	$q->addOrder('co.company_name, dep.dept_parent, dep.dept_name');
 	$obj_company->setAllowedSQL($AppUI->user_id, $q);
 	
 	$active_companies = $q->loadList();
 
 	$q->clear();
-	$q->addTable('companies', 'c');
-	$q->addQuery('distinct c.company_id, c.company_name, dep.*');
-	$q->addJoin('departments', 'dep', 'c.company_id = dep.dept_company');
-	$q->addJoin('projects', 'p', 'p.project_company = c.company_id');
-	$q->addOrder('c.company_name, dep.dept_parent, dep.dept_name');
+	$q->addTable('companies', 'co');
+	$q->addQuery('distinct co.company_id, co.company_name, dep.*');
+	$q->addJoin('departments', 'dep', 'dep.dept_company=co.company_id');
+	$q->addJoin('projects', 'p', 'p.project_company = co.company_id');
+	$q->addOrder('co.company_name, dep.dept_parent, dep.dept_name');
 	$obj_company->setAllowedSQL($AppUI->user_id, $q);
+	//echo $q->prepare();
 	$all_companies = $q->loadList();
 
 	//display the select list
@@ -784,6 +810,36 @@ function projects_list_data($user_id=false) {
 	$cBuffer .= '</optgroup>';
 
 	$cBuffer .= '</select>';
-
+		
+	return $cBuffer;	
 }
+	
+function getUserFilter(){
+
+	global $AppUI;
+	
+	// prepare the users filter
+	if (isset($_POST['show_owner'])) {
+		$AppUI->setState('ProjIdxowner', intval($_POST['show_owner']));
+	}
+
+	$owner = $AppUI->getState('ProjIdxowner') !== NULL ? $AppUI->getState('ProjIdxowner') : 0;
+
+	$q = new DBQuery;
+	
+	$q->addTable('users', 'u');
+	$q->addJoin('contacts', 'c', 'c.contact_id = u.user_contact');
+	$q->addQuery('user_id');
+	$q->addQuery("CONCAT(contact_last_name, ', ', contact_first_name, ' (', user_username, ')')" 
+				. ' AS label');
+	$q->addOrder('contact_last_name, contact_first_name, user_username');
+	$userRows = array(0 => $AppUI->_('All Users', UI_OUTPUT_RAW)) + $q->loadHashList();
+
+	$bufferUser = arraySelect($userRows, 'show_owner', 
+                          'class="text" onchange="javascript:document.pickUser.submit()""', $owner);
+
+	return $bufferUser;
+	
+}	
+
 ?>

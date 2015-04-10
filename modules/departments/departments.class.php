@@ -24,7 +24,7 @@ class CDepartment extends CDpObject {
 	var $dept_owner = NULL;
 
 	public function __construct() {
-		// empty constructor
+		parent::__construct('departments', 'dept_id');
 	}
 
 	function load($oid=null, $strip = true) {
@@ -140,15 +140,19 @@ function findchilddept(&$tarr, $parent, $level=0) {
 	}
 }
 
-/* Receiving a hash list - UNUSED FUNCTION */
+/* Receiving a hash list */
 function addDeptId($dataset, $parent) {
-	global $dept_ids;
+
+	if ( !is_array( $dataset ) or count( $dataset ) == 0 ) return array($parent);
+		
+	$dept_ids = array($parent);
 	foreach ($dataset as $data) {
 		if ($data['dept_parent'] == $parent) {
 			$dept_ids[] = $data['dept_id'];
 			addDeptId($dataset, $data['dept_id']);
 		}
 	}
+	return $dept_ids;
 }
 
 ?>

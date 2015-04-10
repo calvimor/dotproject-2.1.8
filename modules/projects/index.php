@@ -37,12 +37,15 @@ if (isset($_GET['tab'])) {
 }
 
 $tab = $AppUI->getState('ProjIdxTab') !== NULL ? $AppUI->getState('ProjIdxTab') : 500;
+
 $currentTabId = $tab;
 $active = intval(!$AppUI->getState('ProjIdxTab'));
 
+// Projects filter
 if (isset($_POST['company_id'])) {
 	$AppUI->setState('ProjIdxCompany', intval($_POST['company_id']));
 }
+
 $company_id = (($AppUI->getState('ProjIdxCompany') !== NULL) 
                ? $AppUI->getState('ProjIdxCompany') 
                : $AppUI->user_company);
@@ -51,10 +54,10 @@ $company_prefix = 'company_';
 
 if (isset($_POST['department'])) {
 	$AppUI->setState('ProjIdxDepartment', dPgetCleanParam($_POST, 'department'));
-	
 	//if department is set, ignore the company_id field
 	unset($company_id);
 }
+
 $department = (($AppUI->getState('ProjIdxDepartment') !== NULL) 
                ? $AppUI->getState('ProjIdxDepartment') 
                : ($company_prefix . $AppUI->user_company));
@@ -62,64 +65,55 @@ $department = (($AppUI->getState('ProjIdxDepartment') !== NULL)
 //if $department contains the $company_prefix string that it's requesting a company
 // and not a department.  So, clear the $department variable, and populate the $company_id variable.
 if (!(mb_strpos($department, $company_prefix)===false)) {
+	
 	$company_id = mb_substr($department,mb_strlen($company_prefix));
 	$AppUI->setState('ProjIdxCompany', $company_id);
 	unset($department);
 }
 
-$valid_ordering = array('project_name', 'user_username', 'my_tasks desc', 'total_tasks desc',
-                        'total_tasks', 'my_tasks', 'project_color_identifier', 'company_name', 
-                        'project_end_date', 'project_start_date', 'project_actual_end_date', 
-                        'task_log_problem DESC,project_priority', 'project_status', 
-                        'project_percent_complete');
-
-$orderdir = $AppUI->getState('ProjIdxOrderDir') ? $AppUI->getState('ProjIdxOrderDir') : 'asc';
-if (isset($_GET['orderby']) && in_array($_GET['orderby'], $valid_ordering)) {
-	$orderdir = (($AppUI->getState('ProjIdxOrderDir') == 'asc') ? 'desc' : 'asc');
-	$AppUI->setState('ProjIdxOrderBy', $_GET['orderby']);
-}
-$orderby = (($AppUI->getState('ProjIdxOrderBy'))
-            ? $AppUI->getState('ProjIdxOrderBy') : 'project_end_date');
-$AppUI->setState('ProjIdxOrderDir', $orderdir);
-
-// prepare the users filter
-if (isset($_POST['show_owner'])) {
-	$AppUI->setState('ProjIdxowner', intval($_POST['show_owner']));
-}
-$owner = $AppUI->getState('ProjIdxowner') !== NULL ? $AppUI->getState('ProjIdxowner') : 0;
-
-$q->addTable('users', 'u');
-$q->addJoin('contacts', 'c', 'c.contact_id = u.user_contact');
-$q->addQuery('user_id');
-$q->addQuery("CONCAT(contact_last_name, ', ', contact_first_name, ' (', user_username, ')')" 
-             . ' AS label');
-$q->addOrder('contact_last_name, contact_first_name, user_username');
-$userRows = array(0 => $AppUI->_('All Users', UI_OUTPUT_RAW)) + $q->loadHashList();
-$bufferUser = arraySelect($userRows, 'show_owner', 
-                          'class="text" onchange="javascript:document.pickUser.submit()""', $owner);
-
-/* setting this to filter project_list_data function below
- 0 = undefined
- 3 = active
- 5 = completed
- 7 = archived
-
-Because these are "magic" numbers, if the values for ProjectStatus change under 'System Admin', 
-they'll need to change here as well (sadly).
-*/
-if ($tab != 7 && $tab != 8) {
-	$project_status = $tab;
-} else if ($tab == 0) {
-	$project_status = 0;
-}
-if ($tab == 5 || $tab == 7) {
-	$project_active = 0;
-}
-
 //for getting permissions for records related to projects
 $obj_project = new CProject();
-// collect the full (or filtered) projects list data via function in projects.class.php
-projects_list_data();
+
+// Not Gantt ?
+if ( $tab !== 501 ){
+
+	$valid_ordering = array('project_name', 'user_username', 'my_tasks desc', 'total_tasks desc',
+							'total_tasks', 'my_tasks', 'project_color_identifier', 'company_name', 
+							'project_end_date', 'project_start_date', 'project_actual_end_date', 
+							'task_log_problem DESC,project_priority', 'project_status', 
+							'project_percent_complete');
+
+	$orderdir = $AppUI->getState('ProjIdxOrderDir') ? $AppUI->getState('ProjIdxOrderDir') : 'asc';
+
+	if (isset($_GET['orderby']) && in_array($_GET['orderby'], $valid_ordering)) {
+		$orderdir = (($AppUI->getState('ProjIdxOrderDir') == 'asc') ? 'desc' : 'asc');
+		$AppUI->setState('ProjIdxOrderBy', $_GET['orderby']);
+	}
+
+	$orderby = (($AppUI->getState('ProjIdxOrderBy'))
+				? $AppUI->getState('ProjIdxOrderBy') : 'project_end_date');
+
+	$AppUI->setState('ProjIdxOrderDir', $orderdir);
+
+	$bufferUser = getUserFilter();
+	
+	// setting this to filter project_list_data function below
+	// 0 = undefined
+	// 3 = active
+	// 5 = completed
+	// 7 = archived
+	// collect the full (or filtered) projects list data via function in projects.class.php only if not Gantt tab
+	projects_list_data();
+
+} else{
+	
+	// regenerate $cBuffer;
+
+	$cBuffer = getCompanyFilter( $company_id, $company_prefix );
+	
+	$bufferUser = getUserFilter();
+
+}	
 
 // setup the title block
 $titleBlock = new CTitleBlock('Projects', 'applet3-48.png', $m, ($m . '.' . $a));
@@ -137,25 +131,69 @@ if ($canAuthor) {
 }
 $titleBlock->show();
 
+// Set the project counters per status
 $project_types = dPgetSysVal('ProjectStatus');
 
+if ( isset($department) ){
+		
+	//
+	 //* If a department is specified, we want to display projects from the department
+	 //* and all departments under that, so we need to build that list of departments
+	 //
+	$q->addTable('departments');
+	$q->addQuery('dept_id, dept_parent');
+	$q->addOrder('dept_parent,dept_name');
+	$rows = $q->loadList();
+		
+} else{
+	
+	$q->addTable('project_departments');
+	$q->addQuery('project_id');
+	$q->addOrder('project_id');
+	$project_department = $q->loadColumn();
+	
+}
+
+$q->clear();
+
 // count number of projects per project_status
+// take into consideration the overall filters imposed on the list see projects_list_data()
 $q->addTable('projects', 'p');
 $q->addQuery('p.project_status, COUNT(p.project_id) as count');
+
+if (isset($department) and ! empty( $department ) ) {
+
+	if (!$addPwOiD) {
+
+		// Join the departments table
+		$q->addJoin('project_departments', 'pd', 'pd.project_id = p.project_id');
+		$q->addJoin( 'departments', 'd', 'd.dept_id=pd.department_id');
+		$q->addQuery( 'd.dept_name' );
+			
+		$dept_ids = addDeptId($rows, $department);
+		$q->addWhere('pd.department_id in (' . implode(',',$dept_ids) . ')');
+	} else {
+		// Show Projects where the Project Owner is in the given department
+		$q->addWhere('p.project_owner IN ('
+		             . ((!empty($owner_ids)) ? implode(',', $owner_ids) : 0) . ')');
+	}
+		
+} else{
+	
+	$project_department_list = implode( ',', $project_department );
+	$q->addWhere( "p.project_id not in (" . $project_department_list . ")" );
+		
+}
+
 $obj_project->setAllowedSQL($AppUI->user_id, $q, null, 'p');
+
 if ($owner > 0) {
 	$q->addWhere('p.project_owner = ' . $owner);
-}
-if (isset($department)) {
-	$q->addJoin('project_departments', 'pd', 'pd.project_id = p.project_id');
-	if (!$addPwOiD) { // Where is this set??
-		$q->addWhere('pd.department_id = ' . (int)$department);
-	}
-} else if ($company_id &&!$addPwOiD) {
-	$q->addWhere('p.project_company = ' . $company_id);
-}
+}	 
 $q->addGroup('project_status');
+
 $statuses = $q->loadHashList('project_status');
+
 $q->clear();
 $all_projects = 0;
 foreach ($statuses as $k => $v) {

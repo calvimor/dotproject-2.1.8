@@ -3,9 +3,10 @@ if (!defined('DP_BASE_DIR')) {
 	die('You should not access this file directly.');
 }
 
-global $AppUI, $m, $a, $company_id, $locale_char_set;
-global $proFilter, $projectStatus, $showInactive, $showLabels, $showAllGantt;
-global $sortTasksByName, $user_id, $dPconfig, $m_orig, $a_orig;
+global $AppUI, $m, $a, $locale_char_set;
+//global $proFilter, $projectStatus, $showCaption, $showAllGantt;
+//global $sortTasksByName, $user_id, $m_orig, $a_orig
+global $dPconfig;
 
 ini_set('max_execution_time', 180);
 ini_set('memory_limit', $dPconfig['reset_memory_limit']);
@@ -17,10 +18,10 @@ include ($AppUI->getLibraryClass('jpgraph/src/jpgraph_gantt'));
 $df = $AppUI->getPref('SHDATEFORMAT');
 $user_id = intval(dPgetParam($_REQUEST, 'user_id', $AppUI->user_id));
 $proFilter = (int)dPgetParam($_REQUEST, 'proFilter', '-1');
-$company_id = intval(dPgetParam($_REQUEST, 'company_id', 0));
-$department = intval(dPgetParam($_REQUEST, 'department', 0));
-$showLabels = (int)dPgetParam($_REQUEST, 'showLabels', 0);
-$showInactive = (int)dPgetParam($_REQUEST, 'showInactive', 0);
+$company_id = intval(dPgetParam($_REQUEST, 'company_id', ''));
+$department = intval(dPgetParam($_REQUEST, 'department', ''));
+$showCaption = (int)dPgetParam($_REQUEST, 'showCaption', 0);
+
 $sortTasksByName = (int)dPgetParam($_REQUEST, 'sortTasksByName', 0);
 $addPwOiD = (int)dPgetParam($_REQUEST, 'addPwOiD', 0);
 $m_orig = dPgetCleanParam($_REQUEST, 'm_orig', $m);
@@ -28,11 +29,21 @@ $a_orig = dPgetCleanParam($_REQUEST, 'a_orig', $a);
 $taskPin = dPgetCleanParam($_REQUEST, 'taskPin', $a); 
 $showWorker = dPgetCleanParam($_REQUEST, 'showWorker', $a );
 
+$showPriority = dPgetCleanParam($_REQUEST, 'showPriority', "" );
+$showType = dPgetCleanParam($_REQUEST, 'showType', "" );	
+
+$showTaskPriority = dPgetCleanParam($_REQUEST, 'showTaskPriority', "" );
+$showTaskType = dPgetCleanParam($_REQUEST, 'showTaskType', "" );
+$showTaskStatus = dPgetCleanParam($_REQUEST, 'showTaskStatus', "" );
+	
 $projectStatus = dPgetSysVal('ProjectStatus');
 $projectStatus = arrayMerge(array('-2' => $AppUI->_('All w/o in progress'), 
                                   '-3' => $AppUI->_(($AppUI->user_id == $user_id) 
                                                     ? 'My projects' : "User's projects")), 
                             $projectStatus);
+
+$addProjectsWithAssignedTasks = (($AppUI->getState('addProjWithTasks'))
+                                 ? $AppUI->getState('addProjWithTasks') : 0);
 
 $pjobj = new CProject;
 $working_hours = $dPconfig['daily_working_hours'];
@@ -54,11 +65,36 @@ if ($addPwOiD && $department > 0) {
 	$q->clear();
 }
 
+if ( isset($department) and !empty($department) ){
+
+	//
+	 //* If a department is specified, we want to display projects from the department
+	 //* and all departments under that, so we need to build that list of departments
+	 //
+	$q->addTable('departments');
+	$q->addQuery('dept_id, dept_parent');
+	$q->addOrder('dept_parent,dept_name');
+	$rows = $q->loadList();
+		
+} else{
+	
+	$q->addTable('project_departments');
+	$q->addQuery('project_id');
+	$q->addOrder('project_id');
+	$sql = $q->prepare;
+	//file_put_contents( 'files/temp/debug', "$sql\n", FILE_APPEND );
+	$project_department = $q->loadColumn();
+
+}
+
+$q->clear();
+
 // pull valid projects and their percent complete information
 // GJB: Note that we have to special case duration type 24 and this refers to the hours in a day, NOT 24 hours
 $q->addTable('projects', 'p');
+
 $q->addQuery('DISTINCT p.project_id, project_color_identifier, project_name, project_start_date' 
-             . ', project_end_date, max(t1.task_end_date) AS project_actual_end_date, d.dept_name' 
+             . ', project_end_date, max(t1.task_end_date) AS project_actual_end_date' 
              . ', SUM(task_duration * task_percent_complete * IF(task_duration_type = 24, ' 
              . $working_hours . ', task_duration_type))' 
              . ' / SUM(task_duration * IF(task_duration_type = 24, ' 
@@ -66,25 +102,30 @@ $q->addQuery('DISTINCT p.project_id, project_color_identifier, project_name, pro
              . ', project_status');
 $q->addJoin('tasks', 't1', 'p.project_id = t1.task_project');
 
-$q->addJoin('companies', 'c1', 'p.project_company = c1.company_id');
-
-$q->addJoin('project_departments', 'pd', 'pd.project_id = p.project_id');
-$q->addJoin( 'departments', 'd', 'd.dept_id=pd.department_id');
-$q->addQuery( 'd.dept_name' );
-
-if ($department > 0) {
-		
+if (isset($department) and ! empty( $department ) ) {
+	
 	if (!$addPwOiD) {
-		$q->addWhere('pd.department_id = ' . $department);
+
+		// Join the departments table
+		$q->addJoin('project_departments', 'pd', 'pd.project_id = p.project_id');
+		$q->addJoin( 'departments', 'd', 'd.dept_id=pd.department_id');
+		$q->addQuery( 'd.dept_name' );
+			
+		$dept_ids = addDeptId($rows, $department);
+		$q->addWhere('pd.department_id in (' . implode(',',$dept_ids) . ')');
 	} else {
 		// Show Projects where the Project Owner is in the given department
-		$q->addWhere('p.project_owner IN (' 
+		$q->addWhere('p.project_owner IN ('
 		             . ((!empty($owner_ids)) ? implode(',', $owner_ids) : 0) . ')');
 	}
-} else if ($company_id != 0 && !$addPwOiD) {
-	$q->addWhere('project_company = ' . $company_id);
+		
+} else{
+	
+	$project_department_list = implode( ',', $project_department );
+	$q->addWhere( "p.project_id not in (" . $project_department_list . ")" );
+		
 }
-
+	
 if ($proFilter == '-4') {
 	$q->addWhere('project_status != 7');
 } else if ($proFilter == '-3') {
@@ -94,6 +135,9 @@ if ($proFilter == '-4') {
 } else if ($proFilter != '-1') {
 	$q->addWhere('project_status = ' . $proFilter);
 }
+//	if (isset($project_status) && $currentTabId != 500) {
+	//	$q->addWhere('p.project_status = '.$project_status);
+//	}
 
 if ($user_id && $m_orig == 'admin' && $a_orig == 'viewuser') {
 	$q->addWhere('project_owner = ' . $user_id);
@@ -104,15 +148,20 @@ if ($taskPin == '1') {
 	$q->addWhere('tp.task_pinned = 1');
 }
 
-if ($showInactive != '1') {
-	$q->addWhere('project_status != 7');
+if ( $showPriority ){
+	$q->addWhere( 'project_priority = ' . $showPriority );
+}	
+if ( $showType ){
+	$q->addWhere( 'project_type = ' . $showType );
 }
+
 $pjobj->setAllowedSQL($AppUI->user_id, $q, null, 'p');
 $q->addGroup('p.project_id');
 $q->addOrder('project_name, task_end_date DESC');
 
 $sql = $q->prepare() . "\n";
-file_put_contents( 'files/temp/debug', $sql, FILE_APPEND );
+// A prefered way to debug this code because gantt.php is placed as a src of an Html img tag
+//file_put_contents( 'files/temp/gantt-debug', "$sql\n", FILE_APPEND );
 
 $projects = $q->loadList();
 $q->clear();
@@ -123,7 +172,6 @@ $start_date = dPgetCleanParam($_GET, 'start_date', 0);
 $end_date   = dPgetCleanParam($_GET, 'end_date', 0);
 
 $showAllGantt = (int)dPgetParam($_REQUEST, 'showAllGantt', '0');
-//$showTaskGantt = dPgetParam($_GET, 'showTaskGantt', '0');
 
 $graph = new GanttGraph($width);
 $graph->ShowHeaders(GANTT_HYEAR | GANTT_HMONTH | GANTT_HDAY | GANTT_HWEEK);
@@ -177,10 +225,8 @@ if ($start_date && $end_date) {
 	$graph->SetDateRange($start_date, $end_date);
 	$msg = "Date set to\n";
 	// $min_d_start, $max_d_end\n";
-	file_put_contents( 'files/temp/debug', $msg, FILE_APPEND );
 } else {
 	// find out DateRange from gant_arr
-	file_put_contents( 'files/temp/debug', "Date not set\n", FILE_APPEND );
 
 	$d_start = new CDate();
 	$d_end = new CDate();
@@ -271,7 +317,7 @@ if (is_array($projects)) {
 			$cap = '';
 		}
 		
-        if ($showLabels) {
+        if ($showCaption) {
 			$caption .= ($AppUI->_($projectStatus[$p['project_status']]) . ', ');
 			$caption .= (($p['project_status'] <> 7) ? $AppUI->_('active') : $AppUI->_('archived'));
         }
@@ -281,17 +327,20 @@ if (is_array($projects)) {
 		
 		$actual_enddate = new CDate($actual_end);
 		$actual_enddate = $actual_enddate->after($startdate) ? $actual_enddate : $enddate;
+
         $bar = new GanttBar($row++, array($name, $startdate->format($df), $enddate->format($df), 
 		                                  $actual_enddate->format($df)), 
 		                    $start, $actual_end, $cap, 0.6);
-        $bar->progress->Set(min(($progress/100), 1));
+		                    
+		$bar->progress->Set(min(($progress/100), 1));
 		
         if (is_file(TTF_DIR."FreeSans.ttf")) {
 			$bar->title->SetFont(FF_CUSTOM, FS_NORMAL, 9);
         }
+
         $bar->SetFillColor('#' . $p['project_color_identifier']);
         $bar->SetPattern(BAND_SOLID, ('#' . $p['project_color_identifier']));
-		
+
 		//adding captions
 		$bar->caption = new TextProperty($caption);
 		$bar->caption->Align('left','center');
@@ -315,14 +364,33 @@ if (is_array($projects)) {
 			// insert tasks into Gantt Chart
 			// select for tasks for each project	
 			$q->addTable('tasks', 't');
-			$q->addQuery('DISTINCT t.task_id, t.task_name, t.task_start_date, t.task_end_date' 
+
+			$q->addQuery(' t.task_id, t.task_name, t.task_start_date, t.task_end_date' 
 			             . ', t.task_milestone, t.task_dynamic');
+
 			$q->addJoin('projects', 'p', 'p.project_id = t.task_project');
 			$q->addWhere('p.project_id = '. $p['project_id']);
-			$q->addWhere('t.task_status <> -1');
+
+			if ( $showTaskPriority ){
+				$q->addWhere( 'task_priority = ' . $showTaskPriority );
+			}	
+			if ( $showTaskType ){
+				$q->addWhere( 'task_type = ' . $showTaskType );
+			}
+
+			if ( $showTaskStatus == '0' ){
+				$q->addWhere( 'task_status =' . $showTaskStatus );
+			}
+
 			$q->addOrder((($sortTasksByName) ? 't.task_name' : 't.task_end_date ASC'));
+			$sql = $q->prepare();
+			
+			// A prefered way to debug this code because gantt.php is placed as a src of an Html img tag
+			//file_put_contents( 'files/temp/debug', "$sql\n", FILE_APPEND );
 			$tasks = $q->loadList();
 			$q->clear();
+			if ( count( $tasks ) == 0 )
+				$AppUI->setMsg( 'No tasks for project ' . $p['project_name'] );
 			foreach ($tasks as $t) {
 				if ($t['task_end_date'] == null) {
 					$t['task_end_date'] = $t['task_start_date'];
