@@ -707,7 +707,7 @@ function projects_list_data($user_id=false) {
 	
 	/* The next line will set the JOIN for the companies */
 	$obj_project->setAllowedSQL($AppUI->user_id, $q, null, 'p');
-	echo $q->prepare();
+	//echo $q->prepare();
 	$projects = $q->loadList();
 
 	$cBuffer = getCompanyFilter( $company_id, $company_prefix );
