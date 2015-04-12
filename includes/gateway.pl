@@ -592,7 +592,7 @@ sub mail_report {
 	print MAIL "Ticket ID: $ticket\n";
 	print MAIL "Author   : $author\n";
 	print MAIL "Subject  : $subject\n";
-	print MAIL "View     : $app_root/index.php?m=ticketsmith&amp;a=view&amp;ticket=$ticket\n";
+	print MAIL "View     : $app_root/index.php?m=helpdesk&amp;a=view&amp;ticket=$ticket\n";
 	print MAIL "\n--$boundary\n";
 	print MAIL "Content-disposition: inline\n";
 	print MAIL "Content-type: text/html\n\n";
@@ -642,7 +642,7 @@ sub mail_report {
 	print MAIL "    </tr>\n";
 	print MAIL "    <tr>\n";
 	print MAIL "        <td bgcolor=\"white\" nowrap class=\"td\">View:</td>\n";
-	print MAIL "        <td bgcolor=\"white\" nowrap class=\"td\"><a href=\"$app_root/index.php?m=ticketsmith&amp;a=view&amp;ticket=$ticket\">$app_root/index.php?m=ticketsmith&amp;a=view&amp;ticket=$ticket</a></td>\n";
+	print MAIL "        <td bgcolor=\"white\" nowrap class=\"td\"><a href=\"$app_root/index.php?m=helpdesk&amp;a=view&amp;ticket=$ticket\">$app_root/index.php?m=helpdesk&amp;a=view&amp;ticket=$ticket</a></td>\n";
 	print MAIL "    </tr>\n";
 	print MAIL "</table>\n";
 	print MAIL "</body>\n";
