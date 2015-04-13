@@ -708,20 +708,20 @@ class CHelpDeskItem extends CDpObject {
   	global $AppUI;
 
 	$dbPrefix = dPgetConfig( 'dbprefix' );
-	
+	$q = new DBQuery;
     $sql = "
       INSERT INTO " . $dbPrefix . "helpdesk_item_status
       (status_item_id,status_code,status_date,status_modified_by,status_comment)
       VALUES('{$this->item_id}','{$audit_code}',NOW(),'{$AppUI->user_id}','$comment')
     ";
 
-    db_exec($sql);
+//    db_exec($sql);
 
-    if (db_error()) {
-      return false;
-    }
-    
-    $log_id = mysql_insert_id();
+	$q->addQuery( $sql );
+	$log_id = $q->exec();
+	$q->clear();
+			
+    //$log_id = $q->mysql_insert_id();
     // KZHAO 7-31-2006
     if($this->item_notify && $notify==1){
 	    $this->notify(STATUS_LOG, $log_id, $newhdi);

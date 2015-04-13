@@ -249,6 +249,7 @@ var daily_working_hours = <?php echo intval(dPgetConfig('daily_working_hours'));
 	<input name="m" type="hidden" value="tasks" />
 	<input name="a" type="hidden" value="view" />
 	<input name="dosql" type="hidden" value="do_task_aed" />
+	<input type="hidden" name="project_id" value="<?php echo $project->project_id;?>" />
 	<input name="task_id" type="hidden" value="<?php echo $task_id; ?>" />
 	<input name="task_project" type="hidden" value="<?php echo $task_project; ?>" />
 	<input name='task_contacts' id='task_contacts' type='hidden' value="<?php 

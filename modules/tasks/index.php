@@ -18,15 +18,72 @@ if (getPermission('admin', 'view')) { // Only sysadmins are able to change users
 	}
 }
 
+
 if (isset($_POST['f'])) {
 	$AppUI->setState('TaskIdxFilter', $_POST['f']);
 }
-$f = $AppUI->getState('TaskIdxFilter') ? $AppUI->getState('TaskIdxFilter') : 'myunfinished';
+$f= $AppUI->getState('TaskIdxFilter') ? $AppUI->getState('TaskIdxFilter') : 'myunfinished';
 
-if (isset($_POST['f2'])) {
-	$AppUI->setState('CompanyIdxFilter', $_POST['f2']);
+//if (isset($_POST['f2'])) {
+	//$AppUI->setState('CompanyIdxFilter', $_POST['f2']);
+//}
+//$f2 = $AppUI->getState('CompanyIdxFilter') ? $AppUI->getState('CompanyIdxFilter') : 'all';
+
+/* Copy code from projects/index.php */
+
+if (isset($_POST['company_id'])) {
+	$AppUI->setState('ProjIdxCompany', intval($_POST['company_id']));
 }
-$f2 = $AppUI->getState('CompanyIdxFilter') ? $AppUI->getState('CompanyIdxFilter') : 'all';
+
+$company_id = (($AppUI->getState('ProjIdxCompany') !== NULL) 
+               ? $AppUI->getState('ProjIdxCompany') 
+               : $AppUI->user_company);
+
+$company_prefix = 'company_';
+if (isset($_POST['department'])) {
+	$AppUI->setState('TaskIdxDepartment', dPgetCleanParam($_POST, 'department'));
+	
+	//if department is set, ignore the company_id field
+	unset($company_id);
+}
+
+$department = (($AppUI->getState('TaskIdxDepartment') !== NULL) 
+               ? $AppUI->getState('TaskIdxDepartment') 
+               : ($company_prefix . $AppUI->user_company));
+
+//if $department contains the $company_prefix string that it's requesting a company
+// and not a department.  So, clear the $department variable, and populate the $company_id variable.
+$company_prefix = 'company_';
+if (!(mb_strpos($department, $company_prefix)===false)) {
+	$company_id = mb_substr($department,mb_strlen($company_prefix));
+	$AppUI->setState('TaskIdxCompany', $company_id);
+	unset($department);
+}
+
+// collect the full (or filtered) projects list data via function in projects.class.php
+
+$valid_ordering = array('project_name', 'user_username', 'my_tasks desc', 'total_tasks desc',
+                        'total_tasks', 'my_tasks', 'project_color_identifier', 'company_name', 
+                        'project_end_date', 'project_start_date', 'project_actual_end_date', 
+                        'task_log_problem DESC,project_priority', 'project_status', 
+                        'project_percent_complete');
+
+$orderdir = $AppUI->getState('ProjIdxOrderDir') ? $AppUI->getState('ProjIdxOrderDir') : 'asc';
+if (isset($_GET['orderby']) && in_array($_GET['orderby'], $valid_ordering)) {
+	$orderdir = (($AppUI->getState('ProjIdxOrderDir') == 'asc') ? 'desc' : 'asc');
+	$AppUI->setState('ProjIdxOrderBy', $_GET['orderby']);
+}
+
+$orderby = (($AppUI->getState('ProjIdxOrderBy'))
+            ? $AppUI->getState('ProjIdxOrderBy') : 'project_end_date');
+/*
+$AppUI->setState('ProjIdxOrderDir', $orderdir);
+*/
+ 
+$obj_project = new CProject();
+projects_list_data();
+
+/* End of Code copy */
 
 if (isset($_GET['project_id'])) {
 	$AppUI->setState('TaskIdxProject', $_GET['project_id']);
@@ -46,7 +103,6 @@ $titleBlock = new CTitleBlock('Tasks', 'applet-48.png', $m, "$m.$a");
 if (isset($_POST['searchtext'])) {
 	$AppUI->setState('searchtext', $_POST['searchtext']);
 }
-
 
 $search_text = $AppUI->getState('searchtext') ? $AppUI->getState('searchtext'):'';
 $search_text = dPformSafe($search_text);
@@ -74,14 +130,15 @@ if (getPermission('admin', 'view')) {
 
 $titleBlock->addCell();
 $titleBlock->addCell($AppUI->_('Company') . ':');
-$titleBlock->addCell(arraySelect($filters2, 'f2', 
+$titleBlock->addCell(('<form action="?m=tasks" method="post" name="pickCompany">' . "\n" 
+                      . $cBuffer . "\n" .  '</form>' . "\n"));
+/*
+$titleBlock->addCell(arraySelect($filters2, 'department', 
                                  'size=1 class=text onchange="javascript:document.companyFilter.submit();"', 
-                                 $f2, false), '', 
+                                 $department, false), '', 
                      '<form action="?m=tasks" method="post" name="companyFilter">', '</form>'
 );
-
-
-
+*/
 $titleBlock->addCell();
 if ($canEdit && $project_id) {
 	$titleBlock->addCell(('<input type="submit" class="button" value="' . $AppUI->_('new task') 
@@ -120,4 +177,5 @@ $titleBlock->show();
 
 // include the re-usable sub view
 $min_view = false;
+
 include(DP_BASE_DIR.'/modules/tasks/tasks.php');

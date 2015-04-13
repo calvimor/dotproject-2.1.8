@@ -2,10 +2,10 @@
 //Max Execution Time in Installation No Limit 
 set_time_limit(0);
 
-include_once 'check_upgrade.php';
-if ($_POST['mode'] == 'install' && dPcheckUpgrade() == 'upgrade') {
- die('Security Check: dotProject seems to be already configured. Communication broken for Security Reasons!');
-}
+//include_once 'check_upgrade.php';
+//if ($_POST['mode'] == 'install' && dPcheckUpgrade() == 'upgrade') {
+ //die('Security Check: dotProject seems to be already configured. Communication broken for Security Reasons!');
+//}
 ######################################################################################################################
 
 $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ? 'https://' : 'http://';
@@ -29,7 +29,7 @@ $dbname = trim(dPInstallGetParam($_POST, 'dbname', ''));
 $dbuser = trim(dPInstallGetParam($_POST, 'dbuser', ''));
 $dbpass = trim(dPInstallGetParam($_POST, 'dbpass', ''));
 $dbdrop = dPInstallGetParam($_POST, 'dbdrop', false);
-$mode = dPInstallGetParam($_POST, 'mode', 'upgrade');
+$mode = dPInstallGetParam($_POST, 'mode', 'install');
 $dbpersist = dPInstallGetParam($_POST, 'dbpersist', false);
 $dobackup = isset($_POST['dobackup']);
 $do_db = isset($_POST['do_db']);
@@ -189,7 +189,7 @@ if ($dbc && ($do_db || $do_db_cfg)) {
 		dPmsg('No data updates required');
 	}
  } else {
-  include_once DP_BASE_DIR.'/db/upgrade_permissions.php'; // Always required on install.
+ // include_once DP_BASE_DIR.'/db/upgrade_permissions.php'; // Always required on install.
  }
 
  dPmsg('Updating version information');

@@ -1142,7 +1142,7 @@ class CTabBox_core {
 	}
 	
 	function loadExtras($module, $file = null) {
-		global $AppUI, $acl;
+		global $AppUI;
 		if (! (isset($_SESSION['all_tabs']) && isset($_SESSION['all_tabs'][$module]))) {
 			return false;
 		}

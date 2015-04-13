@@ -947,7 +947,7 @@ class dPacl extends gacl_api {
 		  
 			$q->addQuery( $query );
 			$q->exec();
-//          mysql_query($query);
+			$q->clear();
       }
   }
 

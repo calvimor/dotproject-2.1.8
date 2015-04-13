@@ -39,10 +39,6 @@ $cols = 14;
 
 $dbprefix = dPgetConfig('dbprefix','');
 
-/*
- * Let's figure out which tasks are selected
- */
-
 $tasks_opened = (($AppUI->getState('tasks_opened')) ? $AppUI->getState('tasks_opened') : array());
 
 $task_id = intval(dPgetParam($_GET, 'task_id', 0));
@@ -121,10 +117,9 @@ $q->addJoin('project_departments', 'pd', 'pd.project_id=prj.project_id' );
 $q->addJoin('departments', 'd', 'd.dept_id=pd.department_id');
 $q->addWhere($where_list . (($where_list) ? ' AND ' : '') . 't1.task_id = t1.task_parent');
 $q->addGroup('project_id');
-$q->addOrder('project_name');
+$q->addOrder('company_name,project_name');
 $psql = $q->prepare();
 $q->clear();
-
 
 $q->addTable('projects', 'prj');
 $q->addQuery('project_id, COUNT(t1.task_id) AS total_tasks');
@@ -164,21 +159,25 @@ $select = ('distinct tsk.task_id, task_parent, task_name, task_start_date, task_
 		   . 'task_description, task_owner, task_status, usernames.user_username, ' 
 		   . 'usernames.user_id, task_milestone, assignees.user_username as assignee_username, ' 
 		   . 'count(distinct assignees.user_id) as assignee_count, '
-		   . 'co.contact_first_name, co.contact_last_name, ' 
+		   . 'co.contact_first_name, co.contact_last_name, d.dept_name, ' 
 		   . 'count(distinct fi.file_task) as file_count, ' 
-		   . 'if (tlog.task_log_problem IS NULL, 0, tlog.task_log_problem) AS task_log_problem, d.dept_name ');
+		   . 'if (tlog.task_log_problem IS NULL, 0, tlog.task_log_problem) AS task_log_problem');
 $from = $dbprefix.'tasks as tsk';
 $mods = $AppUI->getActiveModules();
-if (!empty($mods['history']) && getPermission('history', 'view')) {
-	$select .= ', MAX(history_date) as last_update';
-	$join = "LEFT JOIN {$dbprefix}history ON history_item = tsk.task_id AND history_table='tasks' ";
-}
-$join .= 'LEFT JOIN '.$dbprefix.'projects as prj ON project_id = task_project';
-$join .= ' LEFT JOIN '.$dbprefix.'users as usernames ON task_owner = usernames.user_id';
+//if (!empty($mods['history']) && getPermission('history', 'view')) {
+	//$select .= ', MAX(history_date) as last_update';
+	//$join = "LEFT JOIN {$dbprefix}history ON history_item = tsk.task_id AND history_table='tasks' ";
+//}
+$join .= 'LEFT JOIN '.$dbprefix.'projects as prj ON project_id = task_project ';
+$join .= 'LEFT JOIN ' . $dbprefix . 'project_departments pd on pd.project_id = prj.project_id ';
+
+$join .= ' LEFT JOIN ' . $dbprefix . 'departments as d on d.dept_id=pd.department_id ';
+
+$join .= ' LEFT JOIN '.$dbprefix.'users as usernames ON task_owner = usernames.user_id ';
 // patch 2.12.04 show assignee and count
-$join .= ' LEFT JOIN '.$dbprefix.'user_tasks as ut ON ut.task_id = tsk.task_id';
-$join .= ' LEFT JOIN '.$dbprefix.'users as assignees ON assignees.user_id = ut.user_id';
-$join .= ' LEFT JOIN '.$dbprefix.'contacts as co ON co.contact_id = usernames.user_contact';
+$join .= ' LEFT JOIN '.$dbprefix.'user_tasks as ut ON ut.task_id = tsk.task_id ';
+$join .= ' LEFT JOIN '.$dbprefix.'users as assignees ON assignees.user_id = ut.user_id ';
+$join .= ' LEFT JOIN '.$dbprefix.'contacts as co ON co.contact_id = usernames.user_contact ';
 
 // check if there is log report with the problem flag enabled for the task
 $join .= (' LEFT JOIN '.$dbprefix.'task_log AS tlog ON tlog.task_log_task = tsk.task_id ' 
@@ -189,8 +188,6 @@ $join .= ' LEFT JOIN '.$dbprefix.'files as fi on tsk.task_id = fi.file_task';
 $join .= ' LEFT JOIN '.$dbprefix.'user_task_pin as pin ON tsk.task_id = pin.task_id AND pin.user_id = ';
 $join .= $user_id ? $user_id : $AppUI->user_id;
 
-$join .= ' LEFT JOIN ' . $dbprefix . 'task_departments as td on td.task_id=tsk.task_id';
-$join .= ' LEFT JOIN ' . $dbprefix . 'departments as d on d.dept_id=td.department_id';
 $where = $project_id ? ' task_project = '.$project_id : 'project_status <> 7';
 
 if ($pinned_only) {
@@ -284,8 +281,8 @@ if ($search_text = $AppUI->getState('searchtext')) {
 }
 
 // filter tasks considering task and project permissions
-$projects_filter = '';
-$tasks_filter = '';
+//$projects_filter = '';
+//$tasks_filter = '';
 
 // TODO: Enable tasks filtering
 
@@ -304,17 +301,16 @@ $allowedChildrenTasks = $obj->getAllowedSQL($AppUI->user_id, 'task_parent');
 if (count($allowedChildrenTasks)) {
 	$where .= ' AND ' . implode(' AND ', $allowedChildrenTasks);
 }
+
 // echo "<pre>$where</pre>";
 
-// Filter by company
-if (! $min_view && $f2 != 'all') {
-	$join .= ' LEFT JOIN '.$dbprefix.'companies com ON com.company_id = prj.project_company';
-	$where .= ' AND com.company_id = ' . intval($f2);
-}
+// Filter by department
+if (! $min_view && ! empty( $department ) and $department != 'all')
+	$where .= ' AND ' . ' d.dept_id=' . $department;
 
 // patch 2.12.04 ADD GROUP BY clause for assignee count
 $tsql = ('SELECT ' . $select . ' FROM (' . $from . ') ' . $join 
-		 . ' WHERE ' . $where . ' GROUP BY task_id ORDER BY project_id, task_start_date');
+		 . ' WHERE ' . $where . ' GROUP BY task_id ORDER BY prj.project_name, d.dept_name, task_start_date');
 
 //echo "<pre>$tsql</pre>";
 
@@ -501,10 +497,10 @@ function chAssignment(project_id, rmUser, del) {
   <th nowrap="nowrap"><?php sort_by_item_title('Start Date', 'task_start_date', SORT_NUMERIC);?></th>
   <th nowrap="nowrap"><?php sort_by_item_title('Duration', 'task_duration', SORT_NUMERIC);?>&nbsp;&nbsp;</th>
   <th nowrap="nowrap"><?php sort_by_item_title('Finish Date', 'task_end_date', SORT_NUMERIC);?></th>
-<?php if (!empty($mods['history']) && getPermission('history', 'view')) { ?>
-  <th nowrap="nowrap"><?php sort_by_item_title('Last Update', 'last_update', SORT_NUMERIC);?></th>
-<?php } else { $cols--; } ?>
-  <?php if ($showEditCheckbox) { echo '<th width="1">&nbsp;</th>'; } else { $cols--; } ?>
+<?php //if (!empty($mods['history']) && getPermission('history', 'view')) { ?>
+  <!--<th nowrap="nowrap"><?php sort_by_item_title('Last Update', 'last_update', SORT_NUMERIC);?></th> -->
+<?php //} else { $cols--; } ?>
+  <?php //if ($showEditCheckbox) { echo '<th width="1">&nbsp;</th>'; } else { $cols--; } ?>
 </tr>
 <?php
 reset($projects);
@@ -545,7 +541,6 @@ echo (($project_id) ? $AppUI->_('show other projects') : $AppUI->_('show only th
 			<a href="?m=projects&amp;a=view&amp;project_id=<?php echo $k;?>">
 			<span style="color:<?php echo bestColor(@$p['project_color_identifier']); ?>;text-decoration:none;">
 			<strong><?php echo $AppUI->___(@$p['company_name'].' :: ' . 
-								( ( isset( $p['dept_name'] ) and ! empty( $p['dept_name'] ) ) ? $AppUI->___($p['dept_name']) . " :: " : '' ) . 
 								@$p['project_name']);?></strong></span></a>
 		</td>
 		<td width="<?php echo (101 - intval(@$p['project_percent_complete']));?>%"><?php echo (intval(@$p['project_percent_complete']));?>%

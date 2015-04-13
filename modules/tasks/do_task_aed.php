@@ -246,7 +246,8 @@ if ($sub_form) {
 			$AppUI->setMsg($msg, UI_MSG_ERROR);
 		}
 		
-		$AppUI->redirect();
+		// Provide params so that routing behaves correctly
+		$AppUI->redirect('m=projects&a=view&project_id=' . $obj->task_project);
 	}
 
 } // end of if subform
