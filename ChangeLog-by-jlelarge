@@ -1,6 +1,7 @@
 
 Update 2.1.8 mid-march 2015
 
+	-	WARNING - THIS PACKAGE IS BROKEN
 	-	Enhanced the filtering of projects, tasks and Gantt charts per company and departments.
 	    	Started to clean up the project code, removed hard coded values used in applying project filters.
 	    	In particular, project status should absolutely not be touched from the system admin panels as there are hard coded values that 
