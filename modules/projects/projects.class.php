@@ -678,9 +678,10 @@ function projects_list_data($user_id=false) {
 		}
 		
 	} else{
-	
-		$project_department_list = implode( ',', $project_department );
-		$q->addWhere( "p.project_id not in (" . $project_department_list . ")" );
+        if ( isset( $project_department_list ) and count( $project_department_list )){
+			$project_department_list = implode( ',', $project_department );
+			$q->addWhere( "p.project_id not in (" . $project_department_list . ")" );
+		}	
 		
 	}	
 		

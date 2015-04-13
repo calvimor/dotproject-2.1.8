@@ -2,10 +2,10 @@
 //Max Execution Time in Installation No Limit 
 set_time_limit(0);
 
-//include_once 'check_upgrade.php';
-//if ($_POST['mode'] == 'install' && dPcheckUpgrade() == 'upgrade') {
- //die('Security Check: dotProject seems to be already configured. Communication broken for Security Reasons!');
-//}
+include_once 'check_upgrade.php';
+if ($_POST['mode'] == 'install' && dPcheckUpgrade() == 'upgrade') {
+ die('Security Check: dotProject seems to be already configured. Communication broken for Security Reasons!');
+}
 ######################################################################################################################
 
 $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') ? 'https://' : 'http://';
